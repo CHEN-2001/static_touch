@@ -5,6 +5,7 @@ import 'package:static_touch/pages/login/login_provider.dart'; // 你的Provider
 import 'package:static_touch/pages/login/widgets/ripple_animation.dart';
 import 'package:static_touch/services/nfc_service.dart';
 import 'package:static_touch/models/result_entity.dart';
+import 'package:go_router/go_router.dart';
 
 class LoginNfcView extends StatefulWidget {
   const LoginNfcView({super.key});
@@ -62,11 +63,10 @@ class _LoginNfcViewState extends State<LoginNfcView> {
     if (!mounted) return;
     if (resultEntity.status) {
       setState(() => _hintText = "登录成功");
-      await NfcService.stopReading();
+      context.go('/home');
     } else {
       setState(() => _hintText = "登录失败，请重试");
       await Future.delayed(const Duration(seconds: 2));
-      await NfcService.stopReading();
       if (mounted) _autoCheckNfc();
     }
   }

@@ -5,6 +5,7 @@ import 'package:static_touch/pages/login/login_provider.dart';
 import 'package:static_touch/pages/login/widgets/login_input.dart';
 import 'package:static_touch/widgets/scale_button.dart';
 import 'package:static_touch/models/result_entity.dart';
+import 'package:go_router/go_router.dart';
 
 class LoginAccountForm extends StatefulWidget {
   const LoginAccountForm({super.key});
@@ -40,7 +41,7 @@ class _LoginAccountFormState extends State<LoginAccountForm> {
     ResultEntity resultEntity = await loginProvider.login(_accCtrl.text.trim(), _pwdCtrl.text.trim());
     if (!mounted) return;
     if (resultEntity.status) {
-      context.showAppToast(message: "登录成功！！", type: AppToastType.success, position: AppToastPosition.top);
+      context.go('/home');
     } else {
       context.showAppToast(message: "账号或密码错误", type: AppToastType.error, position: AppToastPosition.top);
     }

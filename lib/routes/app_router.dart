@@ -3,22 +3,53 @@ import 'package:provider/provider.dart';
 
 import 'package:static_touch/pages/login/login_page.dart';
 import 'package:static_touch/pages/login/login_provider.dart';
+import 'package:static_touch/pages/main/main_page.dart';
 import 'package:static_touch/pages/home/home_page.dart';
+import 'package:static_touch/pages/home/home_provider.dart';
+import 'package:static_touch/pages/live/live_page.dart';
+import 'package:static_touch/pages/live/live_provider.dart';
+import 'package:static_touch/pages/mine/mine_page.dart';
+import 'package:static_touch/pages/mine/mine_provider.dart';
 
 class AppRouter {
-  // 单例模式或全局静态变量
   static final GoRouter router = GoRouter(
-    initialLocation: '/login', // 明确的初始入口
-    // 全局路由表
+    initialLocation: '/login',
     routes: [
       GoRoute(
         path: '/login',
+        builder: (context, state) => ChangeNotifierProvider(create: (_) => LoginProvider(), child: const LoginPage()),
+      ),
+
+      GoRoute(
+        path: '/main',
         builder: (context, state) {
-          // 在这里按需注入 Provider，极其干净，不会污染全局 Context
-          return ChangeNotifierProvider(create: (_) => LoginProvider(), child: const LoginPage());
+          return MultiProvider(
+            providers: [
+              ChangeNotifierProvider(create: (_) => HomeProvider()),
+              ChangeNotifierProvider(create: (_) => LiveProvider()),
+              ChangeNotifierProvider(create: (_) => MineProvider()),
+            ],
+            child: const MainPage(),
+          );
         },
       ),
-      GoRoute(path: '/home', builder: (context, state) => const HomePage()),
+
+      GoRoute(
+        path: '/home',
+        builder: (context, state) => ChangeNotifierProvider(create: (_) => HomeProvider(), child: const HomePage()),
+      ),
+      GoRoute(
+        path: '/live',
+        builder: (context, state) => ChangeNotifierProvider(create: (_) => LiveProvider(), child: const LivePage()),
+      ),
+      GoRoute(
+        path: '/live',
+        builder: (context, state) => ChangeNotifierProvider(create: (_) => LiveProvider(), child: const LivePage()),
+      ),
+      GoRoute(
+        path: '/mine',
+        builder: (context, state) => ChangeNotifierProvider(create: (_) => MineProvider(), child: const MinePage()),
+      ),
     ],
   );
 }

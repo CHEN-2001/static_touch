@@ -41,7 +41,7 @@ class _LoginAccountFormState extends State<LoginAccountForm> {
     ResultEntity resultEntity = await loginProvider.login(_accCtrl.text.trim(), _pwdCtrl.text.trim());
     if (!mounted) return;
     if (resultEntity.status) {
-      context.go('/home');
+      context.go('/main');
     } else {
       context.showAppToast(message: "账号或密码错误", type: AppToastType.error, position: AppToastPosition.top);
     }

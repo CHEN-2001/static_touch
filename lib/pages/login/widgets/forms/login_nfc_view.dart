@@ -63,7 +63,7 @@ class _LoginNfcViewState extends State<LoginNfcView> {
     if (!mounted) return;
     if (resultEntity.status) {
       setState(() => _hintText = "登录成功");
-      context.go('/home');
+      context.go('/main');
     } else {
       setState(() => _hintText = "登录失败，请重试");
       await Future.delayed(const Duration(seconds: 2));

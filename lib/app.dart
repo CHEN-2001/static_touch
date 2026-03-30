@@ -6,7 +6,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // 💡 官方大厂写法：使用 .router 构造函数
     return MaterialApp.router(
       title: '静触',
       debugShowCheckedModeBanner: false,

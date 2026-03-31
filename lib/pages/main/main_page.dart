@@ -4,6 +4,7 @@ import 'package:static_touch/pages/main/widgets/main_tab_item.dart';
 import 'package:static_touch/pages/home/home_page.dart';
 import 'package:static_touch/pages/live/live_page.dart';
 import 'package:static_touch/pages/mine/mine_page.dart';
+import 'package:static_touch/pages/settings/settings_page.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -16,7 +17,7 @@ class _MainPageState extends State<MainPage> {
   int _currentIndex = 0;
 
   // 页面配置
-  final List<Widget> _pages = const [HomePage(), LivePage(), MinePage(), Center(child: Text('设置中心'))];
+  final List<Widget> _pages = const [HomePage(), LivePage(), MinePage(), SettingsPage()];
 
   @override
   Widget build(BuildContext context) {

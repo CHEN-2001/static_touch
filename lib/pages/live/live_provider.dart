@@ -23,7 +23,13 @@ class LiveProvider with ChangeNotifier {
     LiveItem(title: '直播标题占位符2', status: '直播中', coverUrl: '...'),
     LiveItem(title: '直播标题占位符2', status: '已结束', coverUrl: '...'),
   ];
-
+  // 模拟弹幕列表
+  final List<Map<String, String>> _danmuList = [
+    {'user': '用户1', 'content': '用户互动测试，用户互动测试。'},
+    {'user': '用户2', 'content': '用户互动测试，用户互动测试。'},
+    {'user': '用户3', 'content': '用户互动测试，用户互动测试。'},
+  ];
+  List<Map<String, String>> get danmuList => _danmuList;
   // 💡 关键：根据当前 Tab 索引动态过滤列表
   List<LiveItem> get filteredLives {
     if (_currentTabIndex == 0) return _allLives; // '全部'
@@ -55,5 +61,10 @@ class LiveProvider with ChangeNotifier {
   void startLive() {
     print('模拟跳转到开启直播页面');
     // 跳转逻辑或异步请求逻辑
+  }
+
+  void sendDanmu(String text) {
+    _danmuList.add({'user': '我', 'content': text});
+    notifyListeners();
   }
 }

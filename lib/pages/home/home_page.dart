@@ -17,7 +17,7 @@ class HomePage extends StatelessWidget {
           physics: const BouncingScrollPhysics(), // 增加 iOS 质感的滚动回弹
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: .start,
             children: const [
               SizedBox(height: 20),
               HomeHeader(),

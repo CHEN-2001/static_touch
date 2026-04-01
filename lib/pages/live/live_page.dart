@@ -24,7 +24,7 @@ class LivePage extends StatelessWidget {
                   padding: EdgeInsets.fromLTRB(24, 20, 24, 10),
                   child: Text(
                     '直播',
-                    style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Color(0xFF8B2323)),
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF8B2323)),
                   ),
                 ),
 

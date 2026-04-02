@@ -45,7 +45,7 @@ class ScheduleList extends StatelessWidget {
         break;
       case ScheduleStatus.ongoing:
         // 进行中：跳转直播准备页或直播间
-        context.push('/livePrepare');
+        context.push('/liveDetailPage');
         break;
       case ScheduleStatus.upcoming:
         // 未开始：跳转发布信息页/提醒设置（这里先跳转到 notice 演示）

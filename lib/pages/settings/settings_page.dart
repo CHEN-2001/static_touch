@@ -13,13 +13,22 @@ class SettingsPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xfffdfbf7),
       appBar: AppBar(
-        title: const Text(
-          '设置',
-          style: TextStyle(color: Color(0xFF8B2323), fontWeight: FontWeight.bold),
-        ),
-        backgroundColor: Colors.transparent,
+        // 🚀 核心修改：左对齐，颜色和大小与前页统一
+        centerTitle: false,
+        automaticallyImplyLeading: false,
         elevation: 0,
-        iconTheme: const IconThemeData(color: Color(0xFF8B2323)),
+        backgroundColor: Colors.transparent,
+        title: const Padding(
+          padding: EdgeInsets.only(left: 4), // 增加微调微调对齐感
+          child: Text(
+            '设置',
+            style: TextStyle(
+              color: Color(0xFF8B2323), // 统一使用你之前的深红色
+              fontWeight: FontWeight.bold,
+              fontSize: 22, // 这里的 22px 通常是 TabBar 一级页面的标题标准大字号
+            ),
+          ),
+        ),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -31,19 +40,11 @@ class SettingsPage extends StatelessWidget {
               children: [
                 SettingItem(
                   title: '新消息推送',
-                  trailing: Switch(
-                    value: p.newMsgPush,
-                    onChanged: p.toggleMsgPush,
-                    activeColor: const Color(0xFF5B7F4B),
-                  ),
+                  trailing: AppAnimSwitch(value: p.newMsgPush, onChanged: p.toggleMsgPush),
                 ),
                 SettingItem(
                   title: '直播开始提醒',
-                  trailing: Switch(
-                    value: p.liveStartRemind,
-                    onChanged: p.toggleLiveRemind,
-                    activeColor: const Color(0xFF5B7F4B),
-                  ),
+                  trailing: AppAnimSwitch(value: p.liveStartRemind, onChanged: p.toggleLiveRemind),
                   isLast: true,
                 ),
               ],
@@ -54,19 +55,11 @@ class SettingsPage extends StatelessWidget {
               children: [
                 SettingItem(
                   title: '自动打卡',
-                  trailing: Switch(
-                    value: p.autoCheckIn,
-                    onChanged: p.toggleAutoCheck,
-                    activeColor: const Color(0xFF5B7F4B),
-                  ),
+                  trailing: AppAnimSwitch(value: p.autoCheckIn, onChanged: p.toggleAutoCheck),
                 ),
                 SettingItem(
                   title: '支持后台播放',
-                  trailing: Switch(
-                    value: p.backgroundPlay,
-                    onChanged: p.toggleBgPlay,
-                    activeColor: const Color(0xFF5B7F4B),
-                  ),
+                  trailing: AppAnimSwitch(value: p.backgroundPlay, onChanged: p.toggleBgPlay),
                 ),
                 SettingItem(
                   title: '音质设置',
@@ -79,22 +72,64 @@ class SettingsPage extends StatelessWidget {
             const _SectionTitle('隐私与关于'),
             SettingGroup(
               children: [
-                SettingItem(
+                const SettingItem(
                   title: '隐私政策',
-                  trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+                  trailing: Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey),
                 ),
-                SettingItem(
+                const SettingItem(
                   title: '用户协议',
-                  trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+                  trailing: Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey),
                 ),
-                SettingItem(
+                const SettingItem(
                   title: '清除缓存',
-                  trailing: const Text('10.3MB', style: TextStyle(color: Colors.grey)),
+                  trailing: Text('10.3MB', style: TextStyle(color: Colors.grey, fontSize: 14)),
                   isLast: true,
                 ),
               ],
             ),
+            const SizedBox(height: 40),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+// 🚀 保持你要求的丝滑过渡动画开关
+class AppAnimSwitch extends StatelessWidget {
+  final bool value;
+  final ValueChanged<bool> onChanged;
+
+  const AppAnimSwitch({super.key, required this.value, required this.onChanged});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () => onChanged(!value),
+      behavior: HitTestBehavior.opaque,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 280),
+        curve: Curves.easeInOut,
+        width: 48,
+        height: 28,
+        padding: const EdgeInsets.all(3),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(14),
+          color: value ? const Color(0xFF4F7942) : const Color(0xFFD8D8D8),
+        ),
+        child: AnimatedAlign(
+          duration: const Duration(milliseconds: 280),
+          curve: Curves.easeInOut,
+          alignment: value ? Alignment.centerRight : Alignment.centerLeft,
+          child: Container(
+            width: 22,
+            height: 22,
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+              boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 2, offset: Offset(0, 1))],
+            ),
+          ),
         ),
       ),
     );
@@ -107,7 +142,7 @@ class _SectionTitle extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Padding(
     padding: const EdgeInsets.only(top: 24, bottom: 12, left: 4),
-    child: Text(title, style: const TextStyle(color: Colors.grey, fontSize: 14)),
+    child: Text(title, style: const TextStyle(color: Colors.grey, fontSize: 13)),
   );
 }
 
@@ -118,8 +153,9 @@ class _ArrowTrailing extends StatelessWidget {
   Widget build(BuildContext context) => Row(
     mainAxisSize: MainAxisSize.min,
     children: [
-      Text(text, style: const TextStyle(color: Colors.grey)),
-      const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+      Text(text, style: const TextStyle(color: Colors.grey, fontSize: 14)),
+      const SizedBox(width: 4),
+      const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey),
     ],
   );
 }

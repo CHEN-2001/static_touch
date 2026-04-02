@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'widgets/live_tabs.dart';
 import 'widgets/live_list.dart';
@@ -59,14 +60,20 @@ class StartLiveButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: ScaleButton(
-        // 💡 只有这里的按钮会根据点击状态产生缩放动画
-        onTap: () => context.read<LiveProvider>().startLive(),
+        // 💡 这里执行跳转逻辑
+        onTap: () {
+          // 1. 如果有业务逻辑（如重置 Provider 状态），可以先调用
+
+          // 2. 执行路由跳转到准备页
+          // 使用 push 是因为准备页通常有一个“关闭”按钮，点击后可以返回列表
+          context.push('/livePrepare');
+        },
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
           decoration: BoxDecoration(
             color: const Color(0xFF8B2323),
             borderRadius: BorderRadius.circular(25),
-            boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 10, offset: Offset(0, 4))],
+            boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 10, offset: Offset(0, 4))],
           ),
           child: const Text(
             '+ 开启直播',

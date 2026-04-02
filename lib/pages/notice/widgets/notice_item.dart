@@ -6,6 +6,7 @@ class NoticeItem extends StatelessWidget {
   final String content;
   final String time;
   final bool hasDot;
+  final VoidCallback? onTap;
 
   const NoticeItem({
     super.key,
@@ -14,69 +15,76 @@ class NoticeItem extends StatelessWidget {
     required this.content,
     required this.time,
     this.hasDot = false,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: const BoxDecoration(
-        border: Border(bottom: BorderSide(color: Color(0x0D000000))),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // 左侧头像图标
-          Stack(
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            border: Border(bottom: BorderSide(color: Colors.grey.withOpacity(0.1))),
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              CircleAvatar(
-                radius: 24,
-                backgroundColor: const Color(0xFFEFEBE4),
-                child: Text(type, style: const TextStyle(color: Color(0xFF4A2B11), fontSize: 12)),
+              // 类型图标
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: type == '系统'
+                      ? const Color(0xFF8B2323).withOpacity(0.1)
+                      : const Color(0xFFD4AF37).withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  type == '系统' ? Icons.campaign_rounded : Icons.notifications_active_rounded,
+                  color: type == '系统' ? const Color(0xFF8B2323) : const Color(0xFFD4AF37),
+                  size: 22,
+                ),
               ),
-              if (hasDot)
-                Positioned(
-                  right: 0,
-                  top: 0,
-                  child: Container(
-                    width: 10,
-                    height: 10,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFD4AF37),
-                      shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white, width: 1.5),
+              const SizedBox(width: 12),
+              // 文字内容
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          title,
+                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Color(0xFF3D2B1F)),
+                        ),
+                        Text(time, style: const TextStyle(color: Colors.grey, fontSize: 12)),
+                      ],
                     ),
-                  ),
+                    const SizedBox(height: 6),
+                    Text(
+                      content,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(color: Colors.brown.withValues(alpha: 0.7), fontSize: 13),
+                    ),
+                  ],
+                ),
+              ),
+              // 未读红点
+              if (hasDot)
+                Container(
+                  margin: const EdgeInsets.only(left: 8, top: 4),
+                  width: 8,
+                  height: 8,
+                  decoration: const BoxDecoration(color: Color(0xFF8B2323), shape: BoxShape.circle),
                 ),
             ],
           ),
-          const SizedBox(width: 16),
-          // 中间文字
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      title,
-                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF333333)),
-                    ),
-                    Text(time, style: const TextStyle(fontSize: 12, color: Colors.grey)),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  content,
-                  style: const TextStyle(fontSize: 14, color: Colors.grey),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }

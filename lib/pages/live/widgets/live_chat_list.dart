@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../live_provider.dart';
+import 'package:static_touch/pages/live/live_provider.dart';
 
 class LiveChatList extends StatelessWidget {
   const LiveChatList({super.key});

@@ -34,10 +34,18 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
 
+            <!-- NFC权限 -->
             <intent-filter>
                 <action android:name="android.nfc.action.TECH_DISCOVERED" />
             </intent-filter>
-
+            <!-- 摄像头权限 -->
+            <intent-filter>
+                <action android:name="android.permission.CAMERA" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.permission.RECORD_AUDIO" />
+            </intent-filter>
+            
             <intent-filter>
                 <action android:name="android.nfc.action.NDEF_DISCOVERED" />
                 <data android:mimeType="*/*" />

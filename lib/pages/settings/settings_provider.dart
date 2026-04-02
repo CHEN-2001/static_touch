@@ -1,40 +1,28 @@
 import 'package:flutter/material.dart';
 
-class SettingsProvider with ChangeNotifier {
-  // 消息推送
-  bool _newMsgPush = true;
-  bool get newMsgPush => _newMsgPush;
+class SettingsProvider extends ChangeNotifier {
+  bool newMsgPush = true;
+  bool liveStartRemind = true;
+  bool autoCheckIn = false;
+  bool backgroundPlay = true;
 
-  // 直播提醒
-  bool _liveStartRemind = true;
-  bool get liveStartRemind => _liveStartRemind;
-
-  // 自动打卡
-  bool _autoCheckIn = true;
-  bool get autoCheckIn => _autoCheckIn;
-
-  // 后台播放
-  bool _backgroundPlay = true;
-  bool get backgroundPlay => _backgroundPlay;
-
-  // 切换开关的方法
-  void toggleMsgPush(bool value) {
-    _newMsgPush = value;
+  void toggleMsgPush(bool val) {
+    newMsgPush = val;
     notifyListeners();
   }
 
-  void toggleLiveRemind(bool value) {
-    _liveStartRemind = value;
+  void toggleLiveRemind(bool val) {
+    liveStartRemind = val;
     notifyListeners();
   }
 
-  void toggleAutoCheck(bool value) {
-    _autoCheckIn = value;
+  void toggleAutoCheck(bool val) {
+    autoCheckIn = val;
     notifyListeners();
   }
 
-  void toggleBgPlay(bool value) {
-    _backgroundPlay = value;
+  void toggleBgPlay(bool val) {
+    backgroundPlay = val;
     notifyListeners();
   }
 }

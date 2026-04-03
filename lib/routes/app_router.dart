@@ -11,11 +11,19 @@ import 'package:static_touch/pages/mine/mine_provider.dart';
 import 'package:static_touch/pages/settings/settings_provider.dart';
 import 'package:static_touch/pages/notice/notice_page.dart';
 import 'package:static_touch/pages/notice/notice_provider.dart';
+import 'package:static_touch/pages/stats/stats_provider.dart';
 import 'package:static_touch/pages/notice/notice_detail_page.dart';
 import 'package:static_touch/pages/nfc/nfc_page.dart';
 import 'package:static_touch/pages/nfc/nfc_provider.dart';
 import 'package:static_touch/pages/live/live_prepare_page.dart';
 import 'package:static_touch/pages/live/live_detail_page.dart';
+import 'package:static_touch/pages/stats/stats_page.dart';
+import 'package:static_touch/pages/meditation_detail/meditation_detail_page.dart';
+import 'package:static_touch/pages/meditation_detail/meditation_detail_provider.dart';
+import 'package:static_touch/pages/live_data/live_data_page.dart';
+import 'package:static_touch/pages/live_data/live_data_provider.dart';
+import 'package:static_touch/pages/collections/collections_page.dart';
+import 'package:static_touch/pages/collections/collections_provider.dart';
 
 class AppRouter {
   static CustomTransitionPage<T> fadePage<T>({required LocalKey key, required Widget child}) {
@@ -106,6 +114,43 @@ class AppRouter {
       GoRoute(
         path: '/liveDetailPage',
         pageBuilder: (context, state) => fadePage(key: state.pageKey, child: const LiveDetailPage()),
+      ),
+      GoRoute(
+        path: '/stats',
+        pageBuilder: (context, state) => fadePage(
+          key: state.pageKey,
+          child: ChangeNotifierProvider(create: (_) => StatsProvider(), child: const StatsPage()),
+        ),
+      ),
+      // 路由定义
+      GoRoute(
+        path: '/meditationDetail',
+        pageBuilder: (context, state) {
+          final params = state.extra as Map<String, dynamic>? ?? {};
+          return fadePage(
+            key: state.pageKey,
+            child: ChangeNotifierProvider(
+              create: (_) => MeditationDetailProvider(),
+              child: MeditationDetailPage(params: params),
+            ),
+          );
+        },
+      ),
+      // 直播数据
+      GoRoute(
+        path: '/liveDataProvider',
+        pageBuilder: (context, state) {
+          return fadePage(
+            key: state.pageKey,
+            child: ChangeNotifierProvider(create: (_) => LiveDataProvider(), child: LiveDataPage()),
+          );
+        },
+      ),
+      // 收藏
+      GoRoute(
+        path: '/collections',
+        builder: (context, state) =>
+            ChangeNotifierProvider(create: (_) => CollectionsProvider(), child: const CollectionsPage()),
       ),
     ],
   );

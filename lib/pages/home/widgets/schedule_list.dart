@@ -40,16 +40,18 @@ class ScheduleList extends StatelessWidget {
   void _handleItemTap(BuildContext context, ScheduleItem item) {
     switch (item.status) {
       case ScheduleStatus.finished:
-        // 已结束：跳转详情页，并携带参数（如 ID）
-        context.push('/livePrepare');
+      case ScheduleStatus.upcoming:
+        context.push(
+          '/meditationDetail',
+          extra: {
+            'title': item.title,
+            'status': item.status,
+            'startTime': item.startTime, // 传入时间
+          },
+        );
         break;
       case ScheduleStatus.ongoing:
-        // 进行中：跳转直播准备页或直播间
         context.push('/liveDetailPage');
-        break;
-      case ScheduleStatus.upcoming:
-        // 未开始：跳转发布信息页/提醒设置（这里先跳转到 notice 演示）
-        context.push('/livePrepare');
         break;
     }
   }

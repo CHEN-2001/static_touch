@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart'; // 1. 导入路由插件
 import 'package:provider/provider.dart';
-import '../live_provider.dart';
+import 'package:static_touch/pages/live/live_provider.dart';
+import 'package:static_touch/pages/home/home_provider.dart';
 
 class LiveList extends StatelessWidget {
   const LiveList({super.key});
@@ -33,8 +34,20 @@ class LiveCardItem extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 20),
       child: InkWell(
         onTap: () {
-          // 3. 跳转逻辑：全部跳转到直播准备页，并携带 item 数据
-          context.push('/livePrepare', extra: item);
+          // 这里的映射逻辑要确保 import 了 ScheduleStatus 枚举所在的 home_provider.dart
+          if (item.status == '直播中') {
+            context.push('/liveDetailPage');
+          } else {
+            // 统一分发到详情页
+            context.push(
+              '/meditationDetail',
+              extra: {
+                'title': item.title,
+                'status': item.status == '已结束' ? ScheduleStatus.finished : ScheduleStatus.upcoming,
+                'startTime': DateTime.now(), // 建议在 LiveItem 模型中加入具体时间字段
+              },
+            );
+          }
         },
         borderRadius: BorderRadius.circular(16), // 水波纹裁切圆角
         child: Container(

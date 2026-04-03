@@ -8,7 +8,7 @@ class LiveTabs extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // 💡 大厂标准：数据源通常是写死的配置
-    final tabs = const ['全部', '直播中', '已结束', '即将开始'];
+    final tabs = const ['全部', '直播中', '即将开始', '已结束'];
     final currentIndex = context.select((LiveProvider p) => p.currentTabIndex);
 
     return Container(

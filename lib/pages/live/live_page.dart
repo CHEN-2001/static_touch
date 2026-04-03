@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
 import 'widgets/live_tabs.dart';
 import 'widgets/live_list.dart';
-import 'live_provider.dart';
 import 'package:static_touch/widgets/scale_button.dart'; // 引入之前的缩放按钮
 
 class LivePage extends StatelessWidget {

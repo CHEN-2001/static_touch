@@ -21,7 +21,13 @@ class MenuCard extends StatelessWidget {
           color: Colors.transparent, // 设置为透明，使用父容器的白色
           child: Column(
             children: [
-              _item(context, '我的收藏', const Icon(Icons.arrow_forward, size: 18), onTap: () => print('点击了收藏')),
+              _item(
+                context,
+                '我的收藏',
+                const Icon(Icons.arrow_forward, size: 18),
+                isLast: false,
+                onTap: () => context.push('/collections'),
+              ),
               _item(
                 context,
                 '我的NFC',
@@ -32,7 +38,7 @@ class MenuCard extends StatelessWidget {
                 context,
                 '修行数据',
                 const Text('查看', style: TextStyle(color: Colors.grey)),
-                onTap: () => print('点击了数据'),
+                onTap: () => context.push('/stats'),
               ),
               _item(context, '帮助中心', const Icon(Icons.arrow_forward, size: 18), onTap: () => print('点击了帮助')),
               _item(
@@ -40,7 +46,7 @@ class MenuCard extends StatelessWidget {
                 '直播数据',
                 const Icon(Icons.arrow_forward, size: 18),
                 isLast: true,
-                onTap: () => print('点击了直播数据'),
+                onTap: () => context.push('/liveDataProvider'),
               ),
             ],
           ),
@@ -58,7 +64,7 @@ class MenuCard extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
         // 这里的 decoration 只负责底部的分割线
         decoration: BoxDecoration(
-          border: isLast ? null : Border(bottom: BorderSide(color: Colors.grey.withOpacity(0.1))),
+          border: isLast ? null : Border(bottom: BorderSide(color: Colors.grey.withValues(alpha: 0.1))),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,

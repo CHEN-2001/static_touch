@@ -2,17 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:static_touch/models/result_entity.dart';
 
 class LoginProvider extends ChangeNotifier {
-  //  页面私有状态
-  bool _isAgreed = false;
-  bool _isAccountLogin = true;
-  bool _isLoading = false;
+  bool _isAgreed = false; //协议勾选
+  bool _isAccountLogin = true; //是否是账号登录方式
+  bool _isLoading = false; //登录载入
 
-  //  暴露 Getter 给 UI 使用
   bool get isAgreed => _isAgreed;
   bool get isAccountLogin => _isAccountLogin;
   bool get isLoading => _isLoading;
 
-  //  方法事件
   // 切换协议勾选
   void toggleAgreement() {
     _isAgreed = !_isAgreed;

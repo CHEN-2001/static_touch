@@ -6,7 +6,7 @@ import 'package:static_touch/models/result_entity.dart';
 class NfcService {
   static bool _isReading = false;
 
-  /// 检查NFC状态
+  // 检查NFC状态
   static Future<ResultEntity> checkStatus() async {
     final status = await NfcManager.instance.checkAvailability();
     String message;
@@ -24,7 +24,7 @@ class NfcService {
     return ResultEntity(status == NfcAvailability.enabled, message);
   }
 
-  /// 纯 ID 读取模式：专为登录场景设计
+  // ID 读取
   static void startReading({required Function(String id) onSuccess, Function(String error)? onError}) {
     _isReading = false;
     NfcManager.instance.startSession(

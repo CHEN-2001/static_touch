@@ -13,6 +13,15 @@ class LoginInput extends StatefulWidget {
 
 class _LoginInputState extends State<LoginInput> {
   late bool _isObscured;
+  static final _enabledBorder = OutlineInputBorder(
+    borderRadius: BorderRadius.circular(8),
+    borderSide: const BorderSide(color: Color(0xFFF2E7C2)),
+  );
+
+  static final _focusedBorder = OutlineInputBorder(
+    borderRadius: BorderRadius.circular(8),
+    borderSide: const BorderSide(color: Color(0xFFfecc46)),
+  );
 
   @override
   void initState() {
@@ -25,37 +34,48 @@ class _LoginInputState extends State<LoginInput> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(widget.label, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+        Text(
+          widget.label,
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF333333)),
+        ),
         const SizedBox(height: 8),
+
         TextField(
           controller: widget.controller,
-          obscureText: _isObscured,
+          obscureText: _isObscured, // 控制文本遮罩
+          cursorColor: const Color(0xFF8B2323), // 设定光标颜色与主题一致
           decoration: InputDecoration(
             filled: true,
             fillColor: Colors.white,
             contentPadding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
-            suffixIcon: widget.isPassword
-                ? IconButton(
-                    icon: Icon(_isObscured ? Icons.visibility_off : Icons.visibility, color: const Color(0xFFF2E7C2)),
-                    onPressed: () {
-                      setState(() {
-                        _isObscured = !_isObscured;
-                      });
-                    },
-                  )
-                : null,
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Color(0xFFF2E7C2)),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Color(0xFFfecc46)),
-            ),
+
+            suffixIcon: widget.isPassword ? _buildVisibilityToggle() : null,
+
+            enabledBorder: _enabledBorder,
+            focusedBorder: _focusedBorder,
           ),
         ),
+
         const SizedBox(height: 20),
       ],
+    );
+  }
+
+  Widget _buildVisibilityToggle() {
+    return IconButton(
+      icon: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 200),
+        child: Icon(
+          _isObscured ? Icons.visibility_off : Icons.visibility,
+          key: ValueKey<bool>(_isObscured),
+          color: const Color(0xFFF2E7C2),
+        ),
+      ),
+      onPressed: () {
+        setState(() {
+          _isObscured = !_isObscured;
+        });
+      },
     );
   }
 }

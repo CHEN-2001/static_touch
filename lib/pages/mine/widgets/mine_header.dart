@@ -7,18 +7,6 @@ class MineHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        const Padding(
-          padding: EdgeInsets.only(left: 24),
-          child: Align(
-            alignment: Alignment.centerLeft,
-            child: Text(
-              '我的',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Color(0xFF8B2323)),
-            ),
-          ),
-        ),
-        const SizedBox(height: 30),
-        // 圆形头像
         Container(
           width: 90,
           height: 90,

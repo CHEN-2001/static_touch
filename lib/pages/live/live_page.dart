@@ -18,15 +18,6 @@ class LivePage extends StatelessWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // 1. 顶部标题
-                const Padding(
-                  padding: EdgeInsets.fromLTRB(24, 20, 24, 10),
-                  child: Text(
-                    '直播',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF8B2323)),
-                  ),
-                ),
-
                 // 2. 顶部 Tab 切换
                 const LiveTabs(),
                 const SizedBox(height: 16),

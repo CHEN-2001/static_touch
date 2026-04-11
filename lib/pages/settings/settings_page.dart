@@ -12,24 +12,6 @@ class SettingsPage extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: const Color(0xfffdfbf7),
-      appBar: AppBar(
-        // 🚀 核心修改：左对齐，颜色和大小与前页统一
-        centerTitle: false,
-        automaticallyImplyLeading: false,
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-        title: const Padding(
-          padding: EdgeInsets.only(left: 4), // 增加微调微调对齐感
-          child: Text(
-            '设置',
-            style: TextStyle(
-              color: Color(0xFF8B2323), // 统一使用你之前的深红色
-              fontWeight: FontWeight.bold,
-              fontSize: 22, // 这里的 22px 通常是 TabBar 一级页面的标题标准大字号
-            ),
-          ),
-        ),
-      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 20),
         child: Column(

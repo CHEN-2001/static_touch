@@ -22,26 +22,26 @@ class MainTabItem extends StatelessWidget {
     final bool isSelected = currentIndex == index;
     final Color color = isSelected ? const Color(0xFF9E2A2B) : Colors.grey;
 
-    return Expanded(
-      child: ScaleButton(
-        onTap: () => onTap(index),
-        child: Container(
-          color: Colors.transparent,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(icon, color: color, size: 26),
-              const SizedBox(height: 2),
-              Text(
-                label,
-                style: TextStyle(
-                  color: color,
-                  fontSize: 12,
-                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                ),
+    return ScaleButton(
+      onTap: () => onTap(index),
+      child: Container(
+        width: double.infinity,
+        height: double.infinity,
+        color: Colors.transparent,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, color: color, size: 26),
+            const SizedBox(height: 2),
+            Text(
+              label,
+              style: TextStyle(
+                color: color,
+                fontSize: 12,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

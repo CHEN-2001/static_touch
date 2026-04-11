@@ -13,7 +13,6 @@ class MinePage extends StatelessWidget {
         child: SingleChildScrollView(
           child: Column(
             children: const [
-              SizedBox(height: 40),
               MineHeader(), // 顶部
               SizedBox(height: 40),
               MenuCard(), // 功能列表

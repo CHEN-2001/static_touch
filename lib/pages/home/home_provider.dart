@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 enum ScheduleStatus { finished, ongoing, upcoming }
 
 class ScheduleItem {
-  final String id; // 唯一标识，方便列表渲染优化
-  final DateTime startTime; // 使用 DateTime 处理时间，后端传时间戳
+  final String id;
+  final DateTime startTime;
   final String title;
   final ScheduleStatus status;
 
@@ -17,7 +17,6 @@ class ScheduleItem {
   String get timeDisplay =>
       "${startTime.hour.toString().padLeft(2, '0')}:${startTime.minute.toString().padLeft(2, '0')}";
 
-  // 根据状态返回对应的 UI 文字
   String get statusText {
     switch (status) {
       case ScheduleStatus.finished:
@@ -36,11 +35,11 @@ class ScheduleItem {
   Color get statusColor {
     switch (status) {
       case ScheduleStatus.finished:
-        return const Color(0xFFD3D3D3); // 灰色
+        return const Color(0xFFD3D3D3);
       case ScheduleStatus.ongoing:
-        return const Color(0xFF6B8E23); // 橄榄绿
+        return const Color(0xFF6B8E23);
       case ScheduleStatus.upcoming:
-        return const Color(0xFFDAA520); // 琥珀金
+        return const Color(0xFFDAA520);
     }
   }
 }

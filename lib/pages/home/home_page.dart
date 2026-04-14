@@ -20,7 +20,6 @@ class HomePage extends StatelessWidget {
             ),
           ),
           const SliverToBoxAdapter(child: ScheduleList()),
-          const SliverToBoxAdapter(child: SizedBox(height: 30)),
         ],
       ),
     );

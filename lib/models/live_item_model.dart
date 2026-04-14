@@ -1,22 +1,22 @@
-import 'package:static_touch/enum/live_static.dart';
+import 'package:static_touch/enum/live_status_enum.dart';
 
-class LiveItem {
+class LiveItemModel {
   final String id;
   final String title;
   final DateTime startTime;
-  final LiveStatus status;
+  final LiveStatusEnum status;
 
-  LiveItem({required this.id, required this.title, required this.startTime, required this.status});
+  LiveItemModel({required this.id, required this.title, required this.startTime, required this.status});
 
   String get timeDisplay =>
       "${startTime.hour.toString().padLeft(2, '0')}:${startTime.minute.toString().padLeft(2, '0')}";
 
-  factory LiveItem.fromJson(Map<String, dynamic> json) {
-    return LiveItem(
+  factory LiveItemModel.fromJson(Map<String, dynamic> json) {
+    return LiveItemModel(
       id: json['id'] ?? '',
       title: json['title'] ?? '',
       startTime: DateTime.fromMillisecondsSinceEpoch((json['start_time'] ?? 0) * 1000),
-      status: LiveStatus.fromInt(json['status'] ?? 0),
+      status: LiveStatusEnum.fromInt(json['status'] ?? 0),
     );
   }
 }

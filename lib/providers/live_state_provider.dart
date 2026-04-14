@@ -1,29 +1,50 @@
 import 'package:flutter/material.dart';
-import 'package:static_touch/models/live_item.dart';
+import 'dart:async'; // 引入异步工具
+import 'package:static_touch/models/live_item_model.dart';
 import 'package:static_touch/services/live_service.dart';
 
 class LiveListProvider with ChangeNotifier {
   final LiveService _liveService = LiveService();
+  List<LiveItemModel> _items = [];
+  StreamSubscription? _liveSubscription;
 
-  List<LiveItem> _items = [];
-  bool _isLoading = false;
+  List<LiveItemModel> get items => _items;
 
-  // 只读属性
-  List<LiveItem> get items => _items;
-  bool get isLoading => _isLoading;
+  Future<void> initAndRefresh() async {
+    await refreshLiveList();
+    startListeningUpdates();
+  }
 
-  // 初始化或下拉刷新
   Future<void> refreshLiveList() async {
-    _isLoading = true;
-    notifyListeners(); // 告诉 UI 显示加载动画
-
     try {
       _items = await _liveService.fetchLiveListFromApi();
-    } catch (e) {
-      debugPrint("加载直播列表失败: $e");
-    } finally {
-      _isLoading = false;
-      notifyListeners(); // 刷新完成，隐藏加载动画
-    }
+      notifyListeners();
+    } catch (e) {}
+  }
+
+  void startListeningUpdates() {
+    _liveSubscription?.cancel();
+    _liveSubscription = _liveService.listenLiveUpdates().listen((updatedItem) {
+      final newList = List<LiveItemModel>.from(_items);
+
+      int index = newList.indexWhere((item) => item.id == updatedItem.id);
+      if (index != -1) {
+        newList[index] = updatedItem;
+        debugPrint("--- 监听到更新：直播 ${updatedItem.id} 状态变为 ${updatedItem.status.tag} ---");
+      } else {
+        newList.insert(0, updatedItem);
+        debugPrint("--- 监听到新增：新直播 ${updatedItem.id} 已插入 ---");
+      }
+
+      _items = newList;
+
+      notifyListeners();
+    });
+  }
+
+  @override
+  void dispose() {
+    _liveSubscription?.cancel();
+    super.dispose();
   }
 }

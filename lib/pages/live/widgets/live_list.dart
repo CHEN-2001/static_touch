@@ -24,7 +24,7 @@ class LiveList extends StatelessWidget {
 
 // 🚀 直播卡片组件
 class LiveCardItem extends StatelessWidget {
-  final LiveItem item;
+  final LiveItemA item;
   const LiveCardItem({super.key, required this.item});
 
   @override

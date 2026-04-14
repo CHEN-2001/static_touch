@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:static_touch/models/live_item_model.dart';
 import 'package:static_touch/widgets/app_dialogs.dart';
-import 'package:static_touch/pages/home/home_provider.dart';
-import 'meditation_detail_provider.dart';
-import 'models/meditation_schedule_model.dart';
+import 'package:static_touch/pages/shared/meditation_detail/meditation_detail_provider.dart';
+import 'package:static_touch/models/live_detailed_model.dart';
+import 'package:static_touch/enum/live_status_enum.dart';
 
 class MeditationDetailPage extends StatefulWidget {
-  final Map<String, dynamic> params;
-  const MeditationDetailPage({super.key, required this.params});
+  final LiveItemModel item;
+  const MeditationDetailPage({super.key, required this.item});
 
   @override
   State<MeditationDetailPage> createState() => _MeditationDetailPageState();
@@ -18,7 +19,7 @@ class _MeditationDetailPageState extends State<MeditationDetailPage> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<MeditationDetailProvider>().loadDetail(widget.params);
+      context.read<MeditationDetailProvider>().loadDetail(widget.item);
     });
   }
 
@@ -29,7 +30,7 @@ class _MeditationDetailPageState extends State<MeditationDetailPage> {
     if (data == null) return const Scaffold(body: Center(child: CircularProgressIndicator()));
 
     const themeRed = Color(0xFF8B2323);
-    final bool isFinished = data.status == ScheduleStatus.finished;
+    final bool isFinished = data.status == LiveStatusEnum.finished;
 
     return Scaffold(
       backgroundColor: const Color(0xFFFDFBF7),
@@ -102,10 +103,10 @@ class _MeditationDetailPageState extends State<MeditationDetailPage> {
         children: [
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-            decoration: BoxDecoration(color: red.withOpacity(0.1), borderRadius: BorderRadius.circular(4)),
+            decoration: BoxDecoration(color: data.status.color, borderRadius: BorderRadius.circular(4)),
             child: Text(
-              data.status == ScheduleStatus.finished ? "已结束" : "未开始",
-              style: TextStyle(color: red, fontSize: 12, fontWeight: FontWeight.bold),
+              data.status.tag,
+              style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
             ),
           ),
           const SizedBox(height: 16),
@@ -144,7 +145,7 @@ class _MeditationDetailPageState extends State<MeditationDetailPage> {
   }
 
   Widget _buildBottomBar(BuildContext context, MeditationScheduleModel data, MeditationDetailProvider p, Color red) {
-    bool isFinished = data.status == ScheduleStatus.finished;
+    bool isFinished = data.status == LiveStatusEnum.finished;
 
     return Container(
       padding: EdgeInsets.fromLTRB(20, 10, 20, MediaQuery.of(context).padding.bottom + 10),
@@ -169,7 +170,7 @@ class _MeditationDetailPageState extends State<MeditationDetailPage> {
               onPressed: () async {
                 bool? confirm = await context.showAppDialog(title: "设置提醒", content: "课程开始前将提醒您。");
                 if (confirm == true) {
-                  p.toggleRemind();
+                  p.toggleRemind('1');
                   context.showAppToast(message: "设置成功", type: AppToastType.success);
                 }
               },

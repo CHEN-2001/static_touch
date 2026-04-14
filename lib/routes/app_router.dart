@@ -18,12 +18,14 @@ import 'package:static_touch/pages/nfc/nfc_provider.dart';
 import 'package:static_touch/pages/live/live_prepare_page.dart';
 import 'package:static_touch/pages/live/live_detail_page.dart';
 import 'package:static_touch/pages/stats/stats_page.dart';
-import 'package:static_touch/pages/meditation_detail/meditation_detail_page.dart';
-import 'package:static_touch/pages/meditation_detail/meditation_detail_provider.dart';
+import 'package:static_touch/pages/shared/meditation_detail/meditation_detail_page.dart';
+import 'package:static_touch/pages/shared/meditation_detail/meditation_detail_provider.dart';
 import 'package:static_touch/pages/live_data/live_data_page.dart';
 import 'package:static_touch/pages/live_data/live_data_provider.dart';
 import 'package:static_touch/pages/collections/collections_page.dart';
 import 'package:static_touch/pages/collections/collections_provider.dart';
+import 'package:static_touch/providers/live_state_provider.dart';
+import 'package:static_touch/models/live_item_model.dart';
 
 class AppRouter {
   static CustomTransitionPage<T> fadePage<T>({required LocalKey key, required Widget child}) {
@@ -63,6 +65,7 @@ class AppRouter {
               ChangeNotifierProvider(create: (_) => HomeProvider()),
               ChangeNotifierProvider(create: (_) => MineProvider()),
               ChangeNotifierProvider(create: (_) => SettingsProvider()),
+              ChangeNotifierProvider(create: (_) => LiveListProvider()),
             ],
             child: const MainPage(),
           ),
@@ -126,12 +129,12 @@ class AppRouter {
       GoRoute(
         path: '/meditationDetail',
         pageBuilder: (context, state) {
-          final params = state.extra as Map<String, dynamic>? ?? {};
+          final item = state.extra as LiveItemModel;
           return fadePage(
             key: state.pageKey,
             child: ChangeNotifierProvider(
               create: (_) => MeditationDetailProvider(),
-              child: MeditationDetailPage(params: params),
+              child: MeditationDetailPage(item: item),
             ),
           );
         },

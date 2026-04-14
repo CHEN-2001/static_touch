@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 
-class LiveItem {
+class LiveItemA {
   final String title;
   final String status;
   final String coverUrl;
-  LiveItem({required this.title, required this.status, required this.coverUrl});
+  LiveItemA({required this.title, required this.status, required this.coverUrl});
 }
 
 class LiveProvider with ChangeNotifier {
@@ -13,13 +13,13 @@ class LiveProvider with ChangeNotifier {
   int _currentTabIndex = 0;
   int get currentTabIndex => _currentTabIndex;
 
-  final List<LiveItem> _allLives = [
-    LiveItem(title: '静心禅修直播', status: '直播中', coverUrl: ''),
-    LiveItem(title: '午间修行提醒', status: '即将开始', coverUrl: ''),
-    LiveItem(title: '昨日回顾直播', status: '已结束', coverUrl: ''),
+  final List<LiveItemA> _allLives = [
+    LiveItemA(title: '静心禅修直播', status: '直播中', coverUrl: ''),
+    LiveItemA(title: '午间修行提醒', status: '即将开始', coverUrl: ''),
+    LiveItemA(title: '昨日回顾直播', status: '已结束', coverUrl: ''),
   ];
 
-  List<LiveItem> get filteredLives {
+  List<LiveItemA> get filteredLives {
     if (_currentTabIndex == 0) return _allLives;
     String targetStatus = ['全部', '直播中', '即将开始', '已结束'][_currentTabIndex];
     return _allLives.where((item) => item.status == targetStatus).toList();

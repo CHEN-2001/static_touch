@@ -48,7 +48,7 @@ class HomeProvider with ChangeNotifier {
   // 模拟基础信息
   int totalDuration = 128;
   String userName = "用户名";
-  String dailyQuote = "每日语旬预留，每日语旬预留。";
+  String dailyQuote = "每日语句预留，每日语句预留。";
 
   // 模拟列表数据
   // 生产环境下，这里应该是从 API 获取后再转换成 ScheduleItem 对象

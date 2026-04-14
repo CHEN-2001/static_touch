@@ -1,8 +1,8 @@
-import 'package:static_touch/pages/home/home_provider.dart';
+import 'package:static_touch/enum/live_status_enum.dart';
 
 class MeditationScheduleModel {
   final String title;
-  final ScheduleStatus status; // 使用首页的枚举
+  final LiveStatusEnum status;
   final DateTime expectedStartTime;
   final String description;
 
@@ -15,7 +15,7 @@ class MeditationScheduleModel {
     required this.title,
     required this.status,
     required this.expectedStartTime,
-    this.description = "暂无修行简介。静心冥想，感受当下的宁静与平和。",
+    this.description = "暂无修行简介。",
     this.actualStartTime,
     this.actualEndTime,
     this.viewers = 0,
@@ -35,7 +35,7 @@ class MeditationScheduleModel {
 
   // 计算超时
   int get timeoutMinutes {
-    if (status != ScheduleStatus.upcoming) return 0;
+    if (status != LiveStatusEnum.upcoming) return 0;
     final now = DateTime.now();
     if (now.isAfter(expectedStartTime)) {
       return now.difference(expectedStartTime).inMinutes;

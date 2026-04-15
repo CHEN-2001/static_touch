@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'widgets/home_header.dart';
-import 'widgets/duration_card.dart';
-import 'widgets/schedule_list.dart';
+import 'package:static_touch/pages/home/widgets/home_header.dart';
+import 'package:static_touch/pages/home/widgets/duration_card.dart';
+import 'package:static_touch/pages/home/widgets/schedule_list.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});

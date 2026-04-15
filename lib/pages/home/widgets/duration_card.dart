@@ -1,23 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:go_router/go_router.dart'; // 🚀 必须引入，用于跳转
-import '../home_provider.dart';
+import 'package:go_router/go_router.dart';
+import 'package:static_touch/providers/user_state_provider.dart';
 
 class DurationCard extends StatelessWidget {
   const DurationCard({super.key});
 
   @override
   Widget build(BuildContext context) {
+    const borderColor = Color(0xFFF5E6CA);
+    const primaryColor = Color(0xFF4A2B11);
+    const iconColor = Color(0xFFD4AF37);
+
     return Container(
-      // 使用 ClipRRect 确保 InkWell 的点击水波纹不超出圆角边框
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFF5E6CA)),
+        border: Border.all(color: borderColor),
       ),
       child: InkWell(
-        // 🚀 核心跳转逻辑：匹配你在 AppRouter 中定义的 path
         onTap: () => context.push('/stats'),
         child: Padding(
           padding: const EdgeInsets.all(20),
@@ -29,24 +31,18 @@ class DurationCard extends StatelessWidget {
                 children: [
                   const Text('累计静心时长', style: TextStyle(color: Colors.grey, fontSize: 12)),
                   const SizedBox(height: 10),
-                  Selector<HomeProvider, int>(
-                    selector: (_, p) => p.totalDuration,
-                    builder: (_, duration, __) => Text(
-                      '$duration 分钟',
-                      style: const TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF4A2B11), // 统一你的禅意深褐色
-                      ),
-                    ),
+                  Selector<UserStateProvider, int>(
+                    selector: (context, provider) => provider.totalDuration,
+                    builder: (context, duration, child) {
+                      return Text(
+                        '$duration 分钟',
+                        style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: primaryColor),
+                      );
+                    },
                   ),
                 ],
               ),
-              const Icon(
-                Icons.arrow_forward_ios,
-                size: 16,
-                color: Color(0xFFD4AF37), // 对应你 App 的金色
-              ),
+              const Icon(Icons.arrow_forward_ios, size: 16, color: iconColor),
             ],
           ),
         ),

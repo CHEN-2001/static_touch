@@ -1,7 +1,7 @@
 import 'package:static_touch/enum/live_status_enum.dart';
 
 class LiveItemModel {
-  final String id;
+  final int id;
   final String title;
   final DateTime startTime;
   final LiveStatusEnum status;

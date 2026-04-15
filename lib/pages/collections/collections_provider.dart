@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'models/collection_model.dart';
-import 'package:static_touch/pages/home/home_provider.dart';
+import 'package:static_touch/pages/collections/models/collection_model.dart';
+import 'package:static_touch/enum/live_status_enum.dart';
 
 class CollectionsProvider extends ChangeNotifier {
   List<CollectionItem> _items = [];
@@ -15,7 +15,7 @@ class CollectionsProvider extends ChangeNotifier {
         coverUrl: "https://example.com/1.jpg",
         duration: "45min",
         date: "2026-04-01",
-        status: ScheduleStatus.finished,
+        status: LiveStatusEnum.finished,
       ),
       CollectionItem(
         id: "c2",
@@ -23,7 +23,7 @@ class CollectionsProvider extends ChangeNotifier {
         coverUrl: "https://example.com/2.jpg",
         duration: "30min",
         date: "2026-04-05",
-        status: ScheduleStatus.upcoming,
+        status: LiveStatusEnum.upcoming,
       ),
     ];
     notifyListeners();

@@ -3,7 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 // 导入 provider、model、enum
 import 'package:static_touch/providers/live_state_provider.dart';
-import 'package:static_touch/models/live_item_model.dart';
+import 'package:static_touch/models/live/live_item_model.dart';
 import 'package:static_touch/enum/live_status_enum.dart';
 
 class ScheduleList extends StatefulWidget {

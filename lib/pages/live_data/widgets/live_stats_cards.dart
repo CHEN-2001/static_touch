@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../models/live_data_model.dart';
-import 'package:static_touch/pages/home/home_provider.dart'; // 🚀 为了引用 ScheduleStatus 枚举
+import 'package:static_touch/enum/live_status_enum.dart';
 
 // 🚀 顶部深色统计卡片
 class DataHeaderCard extends StatelessWidget {
@@ -87,7 +87,7 @@ class HistoryItemTile extends StatelessWidget {
             '/meditationDetail',
             extra: {
               'title': record.title,
-              'status': ScheduleStatus.finished,
+              'status': LiveStatusEnum.finished,
               'startTime': DateTime.now(), // 实际应传 record 里的时间
             },
           );

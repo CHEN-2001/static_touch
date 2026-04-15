@@ -1,4 +1,4 @@
-import 'package:static_touch/pages/home/home_provider.dart';
+import 'package:static_touch/enum/live_status_enum.dart';
 
 class CollectionItem {
   final String id;
@@ -6,7 +6,7 @@ class CollectionItem {
   final String coverUrl;
   final String duration;
   final String date;
-  final ScheduleStatus status; // 收藏的一般是“已结束”的回放或“未开始”的预约
+  final LiveStatusEnum status; // 收藏的一般是“已结束”的回放或“未开始”的预约
 
   CollectionItem({
     required this.id,

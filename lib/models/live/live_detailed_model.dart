@@ -1,6 +1,7 @@
 import 'package:static_touch/enum/live_status_enum.dart';
 
 class MeditationScheduleModel {
+  final int id;
   final String title;
   final LiveStatusEnum status;
   final DateTime expectedStartTime;
@@ -12,6 +13,7 @@ class MeditationScheduleModel {
   final int viewers;
 
   MeditationScheduleModel({
+    required this.id,
     required this.title,
     required this.status,
     required this.expectedStartTime,

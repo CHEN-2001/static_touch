@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart'; // 1. 导入路由插件
 import 'package:provider/provider.dart';
 import 'package:static_touch/pages/live/live_provider.dart';
-import 'package:static_touch/pages/home/home_provider.dart';
+import 'package:static_touch/enum/live_status_enum.dart';
 
 class LiveList extends StatelessWidget {
   const LiveList({super.key});
@@ -43,7 +43,7 @@ class LiveCardItem extends StatelessWidget {
               '/meditationDetail',
               extra: {
                 'title': item.title,
-                'status': item.status == '已结束' ? ScheduleStatus.finished : ScheduleStatus.upcoming,
+                'status': item.status == '已结束' ? LiveStatusEnum.finished : LiveStatusEnum.upcoming,
                 'startTime': DateTime.now(), // 建议在 LiveItem 模型中加入具体时间字段
               },
             );

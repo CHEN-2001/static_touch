@@ -6,7 +6,6 @@ import 'package:provider/provider.dart';
 import 'package:static_touch/pages/login/login_page.dart';
 import 'package:static_touch/pages/login/login_provider.dart';
 import 'package:static_touch/pages/main/main_page.dart';
-import 'package:static_touch/pages/home/home_provider.dart';
 import 'package:static_touch/pages/mine/mine_provider.dart';
 import 'package:static_touch/pages/settings/settings_provider.dart';
 import 'package:static_touch/pages/notice/notice_page.dart';
@@ -25,7 +24,8 @@ import 'package:static_touch/pages/live_data/live_data_provider.dart';
 import 'package:static_touch/pages/collections/collections_page.dart';
 import 'package:static_touch/pages/collections/collections_provider.dart';
 import 'package:static_touch/providers/live_state_provider.dart';
-import 'package:static_touch/models/live_item_model.dart';
+import 'package:static_touch/models/live/live_item_model.dart';
+import 'package:static_touch/providers/user_state_provider.dart';
 
 class AppRouter {
   static CustomTransitionPage<T> fadePage<T>({required LocalKey key, required Widget child}) {
@@ -62,7 +62,7 @@ class AppRouter {
           key: state.pageKey,
           child: MultiProvider(
             providers: [
-              ChangeNotifierProvider(create: (_) => HomeProvider()),
+              ChangeNotifierProvider(create: (_) => UserStateProvider()),
               ChangeNotifierProvider(create: (_) => MineProvider()),
               ChangeNotifierProvider(create: (_) => SettingsProvider()),
               ChangeNotifierProvider(create: (_) => LiveListProvider()),

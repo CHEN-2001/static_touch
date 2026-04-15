@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:async'; // 引入异步工具
-import 'package:static_touch/models/live_item_model.dart';
+import 'package:static_touch/models/live/live_item_model.dart';
 import 'package:static_touch/services/live_service.dart';
 
 class LiveListProvider with ChangeNotifier {

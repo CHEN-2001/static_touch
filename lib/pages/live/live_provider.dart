@@ -1,28 +1,40 @@
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
-
-class LiveItemA {
-  final String title;
-  final String status;
-  final String coverUrl;
-  LiveItemA({required this.title, required this.status, required this.coverUrl});
-}
+import 'package:static_touch/models/live/live_item_model.dart';
+import 'package:static_touch/services/live_service.dart';
+import 'package:static_touch/enum/live_status_enum.dart';
 
 class LiveProvider with ChangeNotifier {
-  // --- 列表状态 ---
+  final LiveService _liveService = LiveService();
+
   int _currentTabIndex = 0;
   int get currentTabIndex => _currentTabIndex;
 
-  final List<LiveItemA> _allLives = [
-    LiveItemA(title: '静心禅修直播', status: '直播中', coverUrl: ''),
-    LiveItemA(title: '午间修行提醒', status: '即将开始', coverUrl: ''),
-    LiveItemA(title: '昨日回顾直播', status: '已结束', coverUrl: ''),
-  ];
+  List<LiveItemModel> _allLives = [];
+  bool _isLoading = false;
+  bool get isLoading => _isLoading;
 
-  List<LiveItemA> get filteredLives {
+  List<LiveItemModel> get filteredLives {
     if (_currentTabIndex == 0) return _allLives;
-    String targetStatus = ['全部', '直播中', '即将开始', '已结束'][_currentTabIndex];
-    return _allLives.where((item) => item.status == targetStatus).toList();
+    Map<int, LiveStatusEnum> targetStatus = {
+      1: LiveStatusEnum.ongoing,
+      2: LiveStatusEnum.upcoming,
+      3: LiveStatusEnum.finished,
+    };
+    return _allLives.where((item) => item.status == targetStatus[_currentTabIndex]).toList();
+  }
+
+  Future<void> fetchLives() async {
+    _isLoading = true;
+    notifyListeners();
+    try {
+      _allLives = await _liveService.fetchLiveListFromApi();
+    } catch (e) {
+      debugPrint("获取列表失败: $e");
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 
   void setTabIndex(int index) {
@@ -30,16 +42,19 @@ class LiveProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  // --- 相机控制 (重点优化) ---
+  // --- 2. 相机控制 (防抖优化) ---
   CameraController? controller;
   List<CameraDescription>? cameras;
   bool isMicOn = true;
   bool isMirror = false;
   int selectedCameraIndex = 0;
+  bool _isCameraInitializing = false; // 加把锁，防止重复初始化
 
   Future<void> initCamera() async {
-    // 如果已经初始化过，不要重复执行，防止预览闪烁
+    if (_isCameraInitializing) return;
     if (controller != null && controller!.value.isInitialized) return;
+
+    _isCameraInitializing = true;
     try {
       cameras = await availableCameras();
       if (cameras != null && cameras!.isNotEmpty) {
@@ -47,32 +62,28 @@ class LiveProvider with ChangeNotifier {
       }
     } catch (e) {
       debugPrint("相机初始化失败: $e");
+    } finally {
+      _isCameraInitializing = false;
     }
   }
 
   Future<void> _setupController() async {
-    if (controller != null) {
-      await controller!.dispose();
-    }
+    // 销毁旧的，释放内存
+    await controller?.dispose();
 
-    controller = CameraController(
-      cameras![selectedCameraIndex],
-      ResolutionPreset.high,
-      enableAudio: true, // 始终开启硬件通道，避免切换麦克风状态时重启相机导致黑屏
-    );
+    controller = CameraController(cameras![selectedCameraIndex], ResolutionPreset.high, enableAudio: true);
 
     await controller!.initialize();
     notifyListeners();
   }
 
-  // 翻转摄像头 (硬件限制，必须重启，所以黑一下是正常的)
   Future<void> switchCamera() async {
     if (cameras == null || cameras!.length < 2) return;
     selectedCameraIndex = selectedCameraIndex == 0 ? 1 : 0;
     await _setupController();
   }
 
-  // 切换麦克风 (优化：仅改变状态，不重启相机，解决黑屏问题)
+  // 纯 UI 状态切换
   void toggleMic() {
     isMicOn = !isMicOn;
     notifyListeners();
@@ -83,26 +94,21 @@ class LiveProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void prepareLive() => notifyListeners();
+  // --- 3. 弹幕逻辑 (简单直接) ---
+  final List<Map<String, String>> _danmuList = [
+    {'user': '系统', 'content': '欢迎来到直播间'},
+  ];
+  List<Map<String, String>> get danmuList => _danmuList;
+
+  void sendDanmu(String text) {
+    if (text.trim().isEmpty) return;
+    _danmuList.add({'user': '我', 'content': text});
+    notifyListeners();
+  }
 
   @override
   void dispose() {
     controller?.dispose();
     super.dispose();
-  }
-
-  // --- 🚀 补回丢失的弹幕逻辑 ---
-  final List<Map<String, String>> _danmuList = [
-    {'user': '系统', 'content': '欢迎来到直播间'},
-  ];
-
-  // 暴露给 UI 调用的 getter
-  List<Map<String, String>> get danmuList => _danmuList;
-
-  // 发送弹幕的方法
-  void sendDanmu(String text) {
-    if (text.trim().isEmpty) return;
-    _danmuList.add({'user': '我', 'content': text});
-    notifyListeners();
   }
 }

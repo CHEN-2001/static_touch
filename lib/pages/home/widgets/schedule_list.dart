@@ -18,13 +18,13 @@ class _ScheduleListState extends State<ScheduleList> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<LiveListProvider>().initAndRefresh();
+      context.read<LiveStateProvider>().initAndRefresh();
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final List<LiveItemModel> items = context.select((LiveListProvider p) => p.items);
+    final List<LiveItemModel> items = context.select((LiveStateProvider p) => p.items);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

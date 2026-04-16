@@ -5,29 +5,30 @@ import 'package:static_touch/providers/user_state_provider.dart';
 class HomeHeader extends StatelessWidget {
   const HomeHeader({super.key});
 
+  static const _titleStyle = TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: Color(0xFF8B2323));
+
+  static const _quoteStyle = TextStyle(color: Colors.grey, fontSize: 12);
+
   @override
   Widget build(BuildContext context) {
-    const titleColor = Color(0xFF8B2323);
-    const quoteColor = Colors.grey;
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Selector<UserStateProvider, String>(
-          selector: (context, provider) => provider.user.nickName,
-          builder: (context, name, child) {
-            final displayName = name.isEmpty ? '用户' : name;
-            return Text(
-              '早安，$displayName',
-              style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: titleColor),
-            );
+        Selector<UserStateProvider, ({String greeting, String name})>(
+          selector: (_, provider) => (greeting: provider.greeting, name: provider.user.nickName),
+          builder: (context, data, _) {
+            final displayName = data.name.isEmpty ? '用户' : data.name;
+            return Text('${data.greeting}，$displayName', style: _titleStyle);
           },
         ),
+
         const SizedBox(height: 4),
+
         Selector<UserStateProvider, String>(
-          selector: (context, provider) => provider.dailyQuote,
-          builder: (context, quote, child) {
-            return Text(quote, style: const TextStyle(color: quoteColor, fontSize: 12));
+          selector: (_, provider) => provider.dailyQuote,
+          builder: (context, quote, _) {
+            if (quote.isEmpty) return const SizedBox.shrink();
+            return Text(quote, style: _quoteStyle);
           },
         ),
       ],

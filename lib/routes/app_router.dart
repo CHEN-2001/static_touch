@@ -6,23 +6,22 @@ import 'package:provider/provider.dart';
 import 'package:static_touch/pages/login/login_page.dart';
 import 'package:static_touch/pages/login/login_provider.dart';
 import 'package:static_touch/pages/main/main_page.dart';
-import 'package:static_touch/pages/mine/mine_provider.dart';
 import 'package:static_touch/pages/settings/settings_provider.dart';
-import 'package:static_touch/pages/notice/notice_page.dart';
-import 'package:static_touch/pages/notice/notice_provider.dart';
-import 'package:static_touch/pages/stats/stats_provider.dart';
-import 'package:static_touch/pages/notice/notice_detail_page.dart';
-import 'package:static_touch/pages/nfc/nfc_page.dart';
-import 'package:static_touch/pages/nfc/nfc_provider.dart';
+import 'package:static_touch/pages/shared/notice/notice_page.dart';
+import 'package:static_touch/pages/shared/notice/notice_provider.dart';
+import 'package:static_touch/pages/shared/stats/stats_provider.dart';
+import 'package:static_touch/pages/shared/notice/notice_detail_page.dart';
+import 'package:static_touch/pages/shared/nfc/nfc_page.dart';
+import 'package:static_touch/pages/shared/nfc/nfc_provider.dart';
 import 'package:static_touch/pages/live/live_prepare_page.dart';
 import 'package:static_touch/pages/live/live_detail_page.dart';
-import 'package:static_touch/pages/stats/stats_page.dart';
+import 'package:static_touch/pages/shared/stats/stats_page.dart';
 import 'package:static_touch/pages/shared/meditation_detail/meditation_detail_page.dart';
 import 'package:static_touch/pages/shared/meditation_detail/meditation_detail_provider.dart';
-import 'package:static_touch/pages/live_data/live_data_page.dart';
-import 'package:static_touch/pages/live_data/live_data_provider.dart';
-import 'package:static_touch/pages/collections/collections_page.dart';
-import 'package:static_touch/pages/collections/collections_provider.dart';
+import 'package:static_touch/pages/shared/live_data/live_data_page.dart';
+import 'package:static_touch/pages/shared/live_data/live_data_provider.dart';
+import 'package:static_touch/pages/shared/collections/collections_page.dart';
+import 'package:static_touch/pages/shared/collections/collections_provider.dart';
 import 'package:static_touch/providers/live_state_provider.dart';
 import 'package:static_touch/models/live/live_item_model.dart';
 import 'package:static_touch/providers/user_state_provider.dart';
@@ -63,9 +62,8 @@ class AppRouter {
           child: MultiProvider(
             providers: [
               ChangeNotifierProvider(create: (_) => UserStateProvider()),
-              ChangeNotifierProvider(create: (_) => MineProvider()),
               ChangeNotifierProvider(create: (_) => SettingsProvider()),
-              ChangeNotifierProvider(create: (_) => LiveListProvider()),
+              ChangeNotifierProvider(create: (_) => LiveStateProvider()),
             ],
             child: const MainPage(),
           ),

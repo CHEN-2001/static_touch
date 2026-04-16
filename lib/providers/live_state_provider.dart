@@ -3,7 +3,7 @@ import 'dart:async'; // 引入异步工具
 import 'package:static_touch/models/live/live_item_model.dart';
 import 'package:static_touch/services/live_service.dart';
 
-class LiveListProvider with ChangeNotifier {
+class LiveStateProvider with ChangeNotifier {
   final LiveService _liveService = LiveService();
   List<LiveItemModel> _items = [];
   StreamSubscription? _liveSubscription;

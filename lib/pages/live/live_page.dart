@@ -1,39 +1,46 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'widgets/live_tabs.dart';
-import 'widgets/live_list.dart';
-import 'package:static_touch/widgets/scale_button.dart'; // 引入之前的缩放按钮
+import 'package:provider/provider.dart'; // 必须引入
+import 'package:static_touch/pages/live/widgets/live_tabs.dart';
+import 'package:static_touch/pages/live/widgets/live_list.dart';
+import 'package:static_touch/widgets/scale_button.dart';
+import 'package:static_touch/pages/live/live_provider.dart';
 
-class LivePage extends StatelessWidget {
+// 1. 将 StatelessWidget 改为 StatefulWidget，为了使用 initState
+class LivePage extends StatefulWidget {
   const LivePage({super.key});
+
+  @override
+  State<LivePage> createState() => _LivePageState();
+}
+
+class _LivePageState extends State<LivePage> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        context.read<LiveProvider>().fetchLives();
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xfffdfbf7), // 使用图片中的米色背景
+      backgroundColor: const Color(0xfffdfbf7),
       body: SafeArea(
-        // 自动处理顶部和底部状态栏/Home Indicator
         child: Stack(
           children: [
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // 2. 顶部 Tab 切换
                 const LiveTabs(),
                 const SizedBox(height: 16),
-
-                // 3. 直播列表 (必须用 Expanded，防止 Column 内部报错)
                 const Expanded(child: LiveList()),
               ],
             ),
-
-            // 4. 🚀 底部悬浮按钮 (不随页面滚动)
-            Positioned(
-              bottom: 24, // 距离底部高度，适配全面屏 Home Indicator
-              left: 0,
-              right: 0,
-              child: const StartLiveButton(), // 抽离为单独的 Stateless Widget
-            ),
+            const Positioned(bottom: 24, left: 0, right: 0, child: StartLiveButton()),
           ],
         ),
       ),
@@ -41,7 +48,7 @@ class LivePage extends StatelessWidget {
   }
 }
 
-// 🚀 “+开启直播”悬浮按钮组件
+// 🚀 “+开启直播”悬浮按钮组件（保持原样，它是独立的）
 class StartLiveButton extends StatelessWidget {
   const StartLiveButton({super.key});
 
@@ -49,14 +56,7 @@ class StartLiveButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: ScaleButton(
-        // 💡 这里执行跳转逻辑
-        onTap: () {
-          // 1. 如果有业务逻辑（如重置 Provider 状态），可以先调用
-
-          // 2. 执行路由跳转到准备页
-          // 使用 push 是因为准备页通常有一个“关闭”按钮，点击后可以返回列表
-          context.push('/livePrepare');
-        },
+        onTap: () => context.push('/livePrepare'),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
           decoration: BoxDecoration(

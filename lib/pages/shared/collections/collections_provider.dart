@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:static_touch/pages/collections/models/collection_model.dart';
+import 'package:static_touch/pages/shared/collections/models/collection_model.dart';
 import 'package:static_touch/enum/live_status_enum.dart';
 
 class CollectionsProvider extends ChangeNotifier {

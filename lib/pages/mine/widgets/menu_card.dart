@@ -1,70 +1,86 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+// 1. 定义一个简单的配置类，让代码更清晰
+class MenuItemConfig {
+  final String title;
+  final Widget trail;
+  final String? route;
+  final VoidCallback? onTap;
+
+  MenuItemConfig({required this.title, required this.trail, this.route, this.onTap});
+}
+
 class MenuCard extends StatelessWidget {
   const MenuCard({super.key});
 
   @override
   Widget build(BuildContext context) {
+    // 2. 数据驱动：集中管理菜单项，以后增删改查只需要动这个 List
+    final List<MenuItemConfig> menuItems = [
+      MenuItemConfig(title: '我的收藏', trail: const Icon(Icons.arrow_forward, size: 18), route: '/collections'),
+      MenuItemConfig(
+        title: '我的NFC',
+        trail: const Text('查看', style: TextStyle(color: Colors.grey)),
+        route: '/nfc',
+      ),
+      MenuItemConfig(
+        title: '修行数据',
+        trail: const Text('查看', style: TextStyle(color: Colors.grey)),
+        route: '/stats',
+      ),
+      MenuItemConfig(title: '帮助中心', trail: const Icon(Icons.arrow_forward, size: 18), onTap: () => debugPrint('点击了帮助')),
+      MenuItemConfig(title: '直播数据', trail: const Icon(Icons.arrow_forward, size: 18), route: '/liveDataProvider'),
+    ];
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 24),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        // 阴影保持在 Container 上
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4))],
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 4))],
       ),
-      // 💡 核心点 1：使用 ClipRRect 强行裁剪内部所有子组件的溢出
       child: ClipRRect(
         borderRadius: BorderRadius.circular(12),
         child: Material(
-          color: Colors.transparent, // 设置为透明，使用父容器的白色
+          color: Colors.transparent,
           child: Column(
-            children: [
-              _item(
-                context,
-                '我的收藏',
-                const Icon(Icons.arrow_forward, size: 18),
-                isLast: false,
-                onTap: () => context.push('/collections'),
-              ),
-              _item(
-                context,
-                '我的NFC',
-                const Text('查看', style: TextStyle(color: Colors.grey)),
-                onTap: () => context.push('/nfc'),
-              ),
-              _item(
-                context,
-                '修行数据',
-                const Text('查看', style: TextStyle(color: Colors.grey)),
-                onTap: () => context.push('/stats'),
-              ),
-              _item(context, '帮助中心', const Icon(Icons.arrow_forward, size: 18), onTap: () => print('点击了帮助')),
-              _item(
-                context,
-                '直播数据',
-                const Icon(Icons.arrow_forward, size: 18),
-                isLast: true,
-                onTap: () => context.push('/liveDataProvider'),
-              ),
-            ],
+            // 3. 自动遍历生成，并自动判断是否是最后一项
+            children: menuItems.asMap().entries.map((entry) {
+              int index = entry.key;
+              var data = entry.value;
+              return _MenuItem(
+                title: data.title,
+                trail: data.trail,
+                isLast: index == menuItems.length - 1, // 自动判断
+                onTap: data.onTap ?? () => context.push(data.route!),
+              );
+            }).toList(),
           ),
         ),
       ),
     );
   }
+}
 
-  Widget _item(BuildContext context, String title, Widget trail, {bool isLast = false, VoidCallback? onTap}) {
-    // 💡 核心点 2：InkWell 必须在 Material 内部
+// 4. 将 item 抽离成独立的 Widget 提高渲染性能
+class _MenuItem extends StatelessWidget {
+  final String title;
+  final Widget trail;
+  final bool isLast;
+  final VoidCallback onTap;
+  const _MenuItem({required this.title, required this.trail, required this.isLast, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      // 你也可以在这里指定 splashColor: Colors.black12 来让按下的效果更高级
+      splashColor: Colors.black.withValues(alpha: 0.03),
+      highlightColor: Colors.transparent,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
-        // 这里的 decoration 只负责底部的分割线
         decoration: BoxDecoration(
-          border: isLast ? null : Border(bottom: BorderSide(color: Colors.grey.withValues(alpha: 0.1))),
+          border: isLast ? null : const Border(bottom: BorderSide(color: Color(0x0D000000))),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,

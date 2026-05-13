@@ -3,28 +3,51 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 // 导入页面和 Provider
-import 'package:static_touch/pages/login/login_page.dart';
-import 'package:static_touch/pages/login/login_provider.dart';
-import 'package:static_touch/pages/main/main_page.dart';
-import 'package:static_touch/pages/settings/settings_provider.dart';
-import 'package:static_touch/pages/shared/notice/notice_page.dart';
-import 'package:static_touch/pages/shared/notice/notice_provider.dart';
-import 'package:static_touch/pages/shared/stats/stats_provider.dart';
-import 'package:static_touch/pages/shared/notice/notice_detail_page.dart';
-import 'package:static_touch/pages/shared/nfc/nfc_page.dart';
-import 'package:static_touch/pages/shared/nfc/nfc_provider.dart';
-import 'package:static_touch/pages/live/live_prepare_page.dart';
-import 'package:static_touch/pages/live/live_detail_page.dart';
-import 'package:static_touch/pages/shared/stats/stats_page.dart';
-import 'package:static_touch/pages/shared/meditation_detail/meditation_detail_page.dart';
-import 'package:static_touch/pages/shared/meditation_detail/meditation_detail_provider.dart';
-import 'package:static_touch/pages/shared/live_data/live_data_page.dart';
-import 'package:static_touch/pages/shared/live_data/live_data_provider.dart';
-import 'package:static_touch/pages/shared/collections/collections_page.dart';
-import 'package:static_touch/pages/shared/collections/collections_provider.dart';
-import 'package:static_touch/providers/live_state_provider.dart';
-import 'package:static_touch/models/live/live_item_model.dart';
-import 'package:static_touch/providers/user_state_provider.dart';
+import 'package:static_touch/features/splash/splash_page.dart';
+import 'package:static_touch/features/auth/login_page.dart';
+import 'package:static_touch/features/auth/login_provider.dart';
+import 'package:static_touch/features/main_tab/main_page.dart';
+import 'package:static_touch/features/settings/settings_provider.dart';
+import 'package:static_touch/features/notice/notice_page.dart';
+import 'package:static_touch/features/notice/notice_provider.dart';
+import 'package:static_touch/features/stats/stats_provider.dart';
+import 'package:static_touch/features/notice/notice_detail_page.dart';
+import 'package:static_touch/features/nfc/nfc_page.dart';
+import 'package:static_touch/features/nfc/nfc_provider.dart';
+import 'package:static_touch/features/live/live_anchor/live_prepare_page.dart';
+import 'package:static_touch/features/live/live_room/live_detail_page.dart';
+import 'package:static_touch/features/stats/stats_page.dart';
+import 'package:static_touch/features/meditation_detail/meditation_detail_page.dart';
+import 'package:static_touch/features/meditation_detail/meditation_detail_provider.dart';
+import 'package:static_touch/features/live_data/live_data_page.dart';
+import 'package:static_touch/features/live_data/live_data_provider.dart';
+import 'package:static_touch/features/collections/collections_page.dart';
+import 'package:static_touch/features/collections/collections_provider.dart';
+import 'package:static_touch/shared/providers/live_state_provider.dart';
+import 'package:static_touch/shared/models/live/live_item_model.dart';
+import 'package:static_touch/shared/providers/user_state_provider.dart';
+import 'package:static_touch/core/navigation/nav_service.dart';
+import 'package:static_touch/features/live/live_home/live_provider.dart';
+import 'package:static_touch/features/live/live_anchor/live_prepare_provider.dart';
+import 'package:static_touch/features/main_tab/main_tab_provider.dart';
+import 'package:static_touch/features/live/live_room/live_detail_provider.dart';
+import 'package:static_touch/features/mine/mine_provider.dart';
+
+// 定义路由路径常量
+class AppRoutes {
+  static const splash = '/splash';
+  static const login = '/login';
+  static const main = '/main';
+  static const notice = '/notice';
+  static const noticeDetail = '/noticeDetail';
+  static const nfc = '/nfc';
+  static const livePrepare = '/livePrepare';
+  static const liveDetail = '/liveDetailPage';
+  static const stats = '/stats';
+  static const meditationDetail = '/meditationDetail';
+  static const liveData = '/liveDataProvider';
+  static const collections = '/collections';
+}
 
 class AppRouter {
   static CustomTransitionPage<T> fadePage<T>({required LocalKey key, required Widget child}) {
@@ -43,89 +66,104 @@ class AppRouter {
   }
 
   static final GoRouter router = GoRouter(
-    initialLocation: '/login',
+    navigatorKey: NavService.rootNavigatorKey,
+    initialLocation: AppRoutes.splash,
     routes: [
+      // Splash 路由
+      GoRoute(
+        path: AppRoutes.splash,
+        pageBuilder: (context, state) => fadePage(key: state.pageKey, child: const SplashPage()),
+      ),
       // 登录页：局部注入，登录完销毁，不占内存
       GoRoute(
-        path: '/login',
+        path: AppRoutes.login,
         pageBuilder: (context, state) => fadePage(
           key: state.pageKey,
           child: ChangeNotifierProvider(create: (_) => LoginProvider(), child: const LoginPage()),
         ),
       ),
-
+      // 首页基座
       // 首页基座
       GoRoute(
-        path: '/main',
+        path: AppRoutes.main,
         pageBuilder: (context, state) => fadePage(
           key: state.pageKey,
           child: MultiProvider(
             providers: [
+              ChangeNotifierProvider(create: (_) => MainTabProvider()),
               ChangeNotifierProvider(create: (_) => UserStateProvider()),
               ChangeNotifierProvider(create: (_) => SettingsProvider()),
               ChangeNotifierProvider(create: (_) => LiveStateProvider()),
+              ChangeNotifierProvider(create: (_) => LiveProvider()),
+              ChangeNotifierProvider(create: (_) => MineProvider()),
             ],
             child: const MainPage(),
           ),
         ),
       ),
-
       // 通知/公告 (局部注入)
       GoRoute(
-        path: '/notice',
+        path: AppRoutes.notice,
         pageBuilder: (context, state) => fadePage(
           key: state.pageKey,
           child: ChangeNotifierProvider(create: (_) => NoticeProvider(), child: const NoticePage()),
         ),
       ),
-
-      // 通知详细页路由定义
+      // 通知详细页
       GoRoute(
-        path: '/noticeDetail',
+        path: AppRoutes.noticeDetail,
         pageBuilder: (context, state) {
-          // 解析参数
           final data = state.extra as Map<String, dynamic>? ?? {};
           return fadePage(
             key: state.pageKey,
             child: NoticeDetailPage(
               title: data['title'] ?? '系统公告',
-              // 如果需要，也可以把消息列表传过去
               initialMessages: data['messages']?.cast<String>() ?? ['暂无详情内容'],
             ),
           );
         },
       ),
-
       // NFC (局部注入)
       GoRoute(
-        path: '/nfc',
+        path: AppRoutes.nfc,
         pageBuilder: (context, state) => fadePage(
           key: state.pageKey,
           child: ChangeNotifierProvider(create: (_) => NfcProvider(), child: const NfcPage()),
         ),
       ),
-
       // 准备直播
       GoRoute(
-        path: '/livePrepare',
-        pageBuilder: (context, state) => fadePage(key: state.pageKey, child: const LivePreparePage()),
+        path: AppRoutes.livePrepare,
+        pageBuilder: (context, state) => fadePage(
+          key: state.pageKey,
+          child: ChangeNotifierProvider(
+            create: (_) => LivePrepareProvider(), // 注入新管家
+            child: const LivePreparePage(),
+          ),
+        ),
       ),
-
       // 直播详细
       GoRoute(
-        path: '/liveDetailPage',
-        pageBuilder: (context, state) => fadePage(key: state.pageKey, child: const LiveDetailPage()),
+        path: AppRoutes.liveDetail,
+        pageBuilder: (context, state) => fadePage(
+          key: state.pageKey,
+          child: ChangeNotifierProvider(
+            create: (_) => LiveDetailProvider()..enterRoom('test_room_id'),
+            child: const LiveDetailPage(),
+          ),
+        ),
       ),
+      // 统计数据
       GoRoute(
-        path: '/stats',
+        path: AppRoutes.stats,
         pageBuilder: (context, state) => fadePage(
           key: state.pageKey,
           child: ChangeNotifierProvider(create: (_) => StatsProvider(), child: const StatsPage()),
         ),
       ),
-      // 路由定义
+      // 课程详细
       GoRoute(
-        path: '/meditationDetail',
+        path: AppRoutes.meditationDetail,
         pageBuilder: (context, state) {
           final item = state.extra as LiveItemModel;
           return fadePage(
@@ -139,17 +177,17 @@ class AppRouter {
       ),
       // 直播数据
       GoRoute(
-        path: '/liveDataProvider',
+        path: AppRoutes.liveData,
         pageBuilder: (context, state) {
           return fadePage(
             key: state.pageKey,
-            child: ChangeNotifierProvider(create: (_) => LiveDataProvider(), child: LiveDataPage()),
+            child: ChangeNotifierProvider(create: (_) => LiveDataProvider(), child: const LiveDataPage()),
           );
         },
       ),
       // 收藏
       GoRoute(
-        path: '/collections',
+        path: AppRoutes.collections,
         builder: (context, state) =>
             ChangeNotifierProvider(create: (_) => CollectionsProvider(), child: const CollectionsPage()),
       ),

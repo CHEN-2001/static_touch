@@ -2,15 +2,27 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'notice_provider.dart';
-import 'widgets/notice_item.dart';
+import 'widgets/notice_widgets.dart'; // 🚀 统一引入新的聚合组件库
 
-class NoticePage extends StatelessWidget {
+class NoticePage extends StatefulWidget {
   const NoticePage({super.key});
+
+  @override
+  State<NoticePage> createState() => _NoticePageState();
+}
+
+class _NoticePageState extends State<NoticePage> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<NoticeProvider>().fetchNotices();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final p = context.watch<NoticeProvider>();
-    final tabs = ['全部', '公告', '提醒'];
 
     return Scaffold(
       backgroundColor: const Color(0xfffdfbf7),
@@ -18,94 +30,81 @@ class NoticePage extends StatelessWidget {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Color(0xFF4A2B11), size: 18),
-          onPressed: () => context.pop(), // 使用 go_router 的 pop
+          icon: const Icon(
+            Icons.arrow_back_ios,
+            color: Color(0xFF4A2B11),
+            size: 18,
+          ),
+          onPressed: () => context.pop(),
         ),
         centerTitle: true,
         title: const Text(
           '消息通知',
-          style: TextStyle(color: Color(0xFF4A2B11), fontWeight: FontWeight.bold, fontSize: 17),
+          style: TextStyle(
+            color: Color(0xFF4A2B11),
+            fontWeight: FontWeight.bold,
+            fontSize: 17,
+          ),
         ),
         actions: [
-          TextButton(
-            onPressed: p.markAllAsRead,
-            child: const Text('一键已读', style: TextStyle(color: Color(0xFFD4AF37))),
-          ),
+          // 🚀 智能判断：如果有未读消息才显示“一键已读”
+          if (p.displayNotices.any((e) => !e.isRead))
+            TextButton(
+              onPressed: p.isLoading ? null : p.markAllAsRead,
+              child: p.isLoading
+                  ? const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Color(0xFFD4AF37),
+                      ),
+                    )
+                  : const Text(
+                      '一键已读',
+                      style: TextStyle(
+                        color: Color(0xFFD4AF37),
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+            ),
         ],
       ),
       body: Column(
         children: [
-          // 自定义 TabBar
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 10),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: List.generate(tabs.length, (index) {
-                bool isSelected = p.currentTabIndex == index;
-                return GestureDetector(
-                  onTap: () => p.setTabIndex(index),
-                  behavior: HitTestBehavior.opaque,
-                  child: Column(
-                    children: [
-                      Text(
-                        tabs[index],
-                        style: TextStyle(
-                          color: isSelected ? const Color(0xFF8B2323) : Colors.grey,
-                          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                          fontSize: 15,
-                        ),
-                      ),
-                      AnimatedContainer(
-                        duration: const Duration(milliseconds: 200),
-                        height: 2,
-                        width: isSelected ? 20 : 0,
-                        color: const Color(0xFF8B2323),
-                        margin: const EdgeInsets.only(top: 4),
-                      ),
-                    ],
-                  ),
-                );
-              }),
-            ),
-          ),
+          const NoticeTabs(),
           const Divider(height: 1, color: Color(0x1A000000)),
-          // 消息列表
           Expanded(
-            child: ListView(
-              children: [
-                NoticeItem(
-                  type: '系统',
-                  title: '系统公告',
-                  content: '点击查看详细公告内容',
-                  time: '14:15',
-                  hasDot: true,
-                  onTap: () {
-                    context.push(
-                      '/noticeDetail',
-                      extra: {
-                        'title': '系统公告',
-                        'messages': ['感谢关注静触 App！', '这是通过路由传过来的第一条详情消息。'],
-                      },
-                    );
-                  },
-                ),
-                NoticeItem(
-                  type: '系统',
-                  title: '系统公告',
-                  content: '点击查看详细公告内容',
-                  time: '14:15',
-                  hasDot: true,
-                  onTap: () {
-                    context.push(
-                      '/noticeDetail',
-                      extra: {
-                        'title': '系统公告',
-                        'messages': ['感谢关注静触 App！', '这是通过路由传过来的第一条详情消息。'],
-                      },
-                    );
-                  },
-                ),
-              ],
+            child: RefreshIndicator(
+              color: const Color(0xFF8B2323),
+              backgroundColor: Colors.white,
+              onRefresh: () async => await p.fetchNotices(),
+              child: p.isLoading && p.displayNotices.isEmpty
+                  ? const Center(
+                      child: CircularProgressIndicator(
+                        color: Color(0xFF8B2323),
+                      ),
+                    )
+                  : p.displayNotices.isEmpty
+                  ? ListView(
+                      children: const [
+                        SizedBox(height: 200),
+                        Center(
+                          child: Text(
+                            "暂无消息记录",
+                            style: TextStyle(color: Colors.grey),
+                          ),
+                        ),
+                      ],
+                    )
+                  : ListView.builder(
+                      physics: const AlwaysScrollableScrollPhysics(
+                        parent: BouncingScrollPhysics(),
+                      ),
+                      itemCount: p.displayNotices.length,
+                      itemBuilder: (context, index) =>
+                          NoticeItemTile(notice: p.displayNotices[index]),
+                    ),
             ),
           ),
         ],

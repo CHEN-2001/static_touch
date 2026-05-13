@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'collections_provider.dart';
-import 'widgets/collection_item_tile.dart';
+import 'widgets/collections_widgets.dart'; // 🚀 引入聚合组件
 
 class CollectionsPage extends StatefulWidget {
   const CollectionsPage({super.key});
@@ -28,25 +28,50 @@ class _CollectionsPageState extends State<CollectionsPage> {
       appBar: AppBar(
         title: const Text(
           "我的收藏",
-          style: TextStyle(color: Color(0xFF4A2B11), fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: Color(0xFF4A2B11),
+            fontWeight: FontWeight.bold,
+          ),
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Color(0xFF4A2B11), size: 20),
+          icon: const Icon(
+            Icons.arrow_back_ios,
+            color: Color(0xFF4A2B11),
+            size: 20,
+          ),
           onPressed: () => Navigator.pop(context),
         ),
       ),
-      body: p.items.isEmpty
-          ? const Center(
-              child: Text("暂无收藏记录", style: TextStyle(color: Colors.grey)),
-            )
-          : ListView.builder(
-              padding: const EdgeInsets.all(20),
-              itemCount: p.items.length,
-              itemBuilder: (context, index) => CollectionItemTile(item: p.items[index]),
-            ),
+      body: RefreshIndicator(
+        color: const Color(0xFF8B2323),
+        backgroundColor: Colors.white,
+        onRefresh: () async => await p.fetchCollections(),
+        child: p.isLoading && p.items.isEmpty
+            ? const Center(
+                child: CircularProgressIndicator(color: Color(0xFF8B2323)),
+              )
+            : p.items.isEmpty
+            ? ListView(
+                children: const [
+                  SizedBox(height: 200),
+                  Center(
+                    child: Text("暂无收藏记录", style: TextStyle(color: Colors.grey)),
+                  ),
+                ],
+              )
+            : ListView.builder(
+                physics: const AlwaysScrollableScrollPhysics(
+                  parent: BouncingScrollPhysics(),
+                ),
+                padding: const EdgeInsets.all(20),
+                itemCount: p.items.length,
+                itemBuilder: (context, index) =>
+                    CollectionItemTile(item: p.items[index]),
+              ),
+      ),
     );
   }
 }

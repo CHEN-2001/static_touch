@@ -32,6 +32,8 @@ import 'package:static_touch/features/live/live_anchor/live_prepare_provider.dar
 import 'package:static_touch/features/main_tab/main_tab_provider.dart';
 import 'package:static_touch/features/live/live_room/live_detail_provider.dart';
 import 'package:static_touch/features/mine/mine_provider.dart';
+import 'package:static_touch/features/mine/profile_edit/profile_edit_page.dart';
+import 'package:static_touch/features/mine/profile_edit/profile_edit_provider.dart';
 
 // 定义路由路径常量
 class AppRoutes {
@@ -47,10 +49,14 @@ class AppRoutes {
   static const meditationDetail = '/meditationDetail';
   static const liveData = '/liveDataProvider';
   static const collections = '/collections';
+  static const profileEdit = '/profileEdit';
 }
 
 class AppRouter {
-  static CustomTransitionPage<T> fadePage<T>({required LocalKey key, required Widget child}) {
+  static CustomTransitionPage<T> fadePage<T>({
+    required LocalKey key,
+    required Widget child,
+  }) {
     return CustomTransitionPage<T>(
       key: key,
       child: child,
@@ -72,14 +78,18 @@ class AppRouter {
       // Splash 路由
       GoRoute(
         path: AppRoutes.splash,
-        pageBuilder: (context, state) => fadePage(key: state.pageKey, child: const SplashPage()),
+        pageBuilder: (context, state) =>
+            fadePage(key: state.pageKey, child: const SplashPage()),
       ),
       // 登录页：局部注入，登录完销毁，不占内存
       GoRoute(
         path: AppRoutes.login,
         pageBuilder: (context, state) => fadePage(
           key: state.pageKey,
-          child: ChangeNotifierProvider(create: (_) => LoginProvider(), child: const LoginPage()),
+          child: ChangeNotifierProvider(
+            create: (_) => LoginProvider(),
+            child: const LoginPage(),
+          ),
         ),
       ),
       // 首页基座
@@ -91,9 +101,7 @@ class AppRouter {
           child: MultiProvider(
             providers: [
               ChangeNotifierProvider(create: (_) => MainTabProvider()),
-              ChangeNotifierProvider(create: (_) => UserStateProvider()),
               ChangeNotifierProvider(create: (_) => SettingsProvider()),
-              ChangeNotifierProvider(create: (_) => LiveStateProvider()),
               ChangeNotifierProvider(create: (_) => LiveProvider()),
               ChangeNotifierProvider(create: (_) => MineProvider()),
             ],
@@ -106,7 +114,10 @@ class AppRouter {
         path: AppRoutes.notice,
         pageBuilder: (context, state) => fadePage(
           key: state.pageKey,
-          child: ChangeNotifierProvider(create: (_) => NoticeProvider(), child: const NoticePage()),
+          child: ChangeNotifierProvider(
+            create: (_) => NoticeProvider(),
+            child: const NoticePage(),
+          ),
         ),
       ),
       // 通知详细页
@@ -128,7 +139,10 @@ class AppRouter {
         path: AppRoutes.nfc,
         pageBuilder: (context, state) => fadePage(
           key: state.pageKey,
-          child: ChangeNotifierProvider(create: (_) => NfcProvider(), child: const NfcPage()),
+          child: ChangeNotifierProvider(
+            create: (_) => NfcProvider(),
+            child: const NfcPage(),
+          ),
         ),
       ),
       // 准备直播
@@ -158,7 +172,10 @@ class AppRouter {
         path: AppRoutes.stats,
         pageBuilder: (context, state) => fadePage(
           key: state.pageKey,
-          child: ChangeNotifierProvider(create: (_) => StatsProvider(), child: const StatsPage()),
+          child: ChangeNotifierProvider(
+            create: (_) => StatsProvider(),
+            child: const StatsPage(),
+          ),
         ),
       ),
       // 课程详细
@@ -181,15 +198,30 @@ class AppRouter {
         pageBuilder: (context, state) {
           return fadePage(
             key: state.pageKey,
-            child: ChangeNotifierProvider(create: (_) => LiveDataProvider(), child: const LiveDataPage()),
+            child: ChangeNotifierProvider(
+              create: (_) => LiveDataProvider(),
+              child: const LiveDataPage(),
+            ),
           );
         },
       ),
       // 收藏
       GoRoute(
         path: AppRoutes.collections,
-        builder: (context, state) =>
-            ChangeNotifierProvider(create: (_) => CollectionsProvider(), child: const CollectionsPage()),
+        builder: (context, state) => ChangeNotifierProvider(
+          create: (_) => CollectionsProvider(),
+          child: const CollectionsPage(),
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.profileEdit,
+        pageBuilder: (context, state) => fadePage(
+          key: state.pageKey,
+          child: ChangeNotifierProvider(
+            create: (_) => ProfileEditProvider(),
+            child: const ProfileEditPage(),
+          ),
+        ),
       ),
     ],
   );

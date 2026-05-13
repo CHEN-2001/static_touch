@@ -3,7 +3,7 @@ class StatsModel {
   final int streakDays;
   final int totalMinutes;
   final int thisWeekMinutes;
-  final List<ChartData> weeklyTrend; // 包含过去 6 天 + 今日，共 7 条数据
+  final List<ChartData> weeklyTrend;
 
   StatsModel({
     required this.totalDays,

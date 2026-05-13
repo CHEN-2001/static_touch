@@ -4,7 +4,8 @@ class NoticeModel {
   final String title;
   final String content;
   final String time;
-  bool isRead;
+  final bool isRead;
+  final List<String> messages; // 详情页的对话内容
 
   NoticeModel({
     required this.id,
@@ -13,5 +14,6 @@ class NoticeModel {
     required this.content,
     required this.time,
     this.isRead = false,
+    this.messages = const [],
   });
 }

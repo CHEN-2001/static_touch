@@ -13,7 +13,11 @@ class UserRepository {
     if (!isMock) {
       final result = await _client.get(ApiEndpoints.userInfo);
       if (result.status && result.data != null) {
-        return ResultEntity(status: true, message: '获取成功', data: UserModel.fromJson(result.data));
+        return ResultEntity(
+          status: true,
+          message: '获取成功',
+          data: UserModel.fromJson(result.data),
+        );
       }
       return ResultEntity.error(result.message);
     }
@@ -21,17 +25,33 @@ class UserRepository {
     return ResultEntity(
       status: true,
       message: '获取成功',
-      data: UserModel(id: 1, nickName: "不二法门", totalDuration: 1220, dailyQuote: "随缘而行，不离自性。", isAnchor: true),
+      data: UserModel(
+        id: 1,
+        nickName: "不二法门",
+        totalDuration: 1220,
+        dailyQuote: "随缘而行，不离自性。",
+        isAnchor: true,
+      ),
     );
   }
 
-  // 🚀 新增：更新用户信息接口
-  Future<ResultEntity> updateUserInfo({required String nickName, required String dailyQuote}) async {
+  // 🚀 修改点：增加了 avatarUrl 参数
+  Future<ResultEntity> updateUserInfo({
+    required String nickName,
+    required String dailyQuote,
+    String? avatarUrl,
+  }) async {
     if (!isMock) {
-      return await _client.post('/user/update', data: {'nickName': nickName, 'dailyQuote': dailyQuote});
+      return await _client.post(
+        '/user/update',
+        data: {
+          'nickName': nickName,
+          'dailyQuote': dailyQuote,
+          if (avatarUrl != null) 'avatarUrl': avatarUrl, // 如果传了新头像就提交
+        },
+      );
     }
 
-    // 模拟网络延迟
     await Future.delayed(const Duration(milliseconds: 800));
     return ResultEntity(status: true, message: '修改成功');
   }

@@ -14,16 +14,10 @@ class DataHeaderCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.all(20),
       padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 20),
-      decoration: BoxDecoration(
-        color: const Color(0xFF3D2F24),
-        borderRadius: BorderRadius.circular(24),
-      ),
+      decoration: BoxDecoration(color: const Color(0xFF3D2F24), borderRadius: BorderRadius.circular(24)),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          _buildStat("总时长", hours, "h", goldColor),
-          _buildStat("总场次", "$count", "场", goldColor),
-        ],
+        children: [_buildStat("总时长", hours, "h", goldColor), _buildStat("总场次", "$count", "场", goldColor)],
       ),
     );
   }
@@ -31,10 +25,7 @@ class DataHeaderCard extends StatelessWidget {
   Widget _buildStat(String label, String value, String unit, Color color) {
     return Column(
       children: [
-        Text(
-          label,
-          style: TextStyle(color: color.withOpacity(0.8), fontSize: 13),
-        ),
+        Text(label, style: TextStyle(color: color.withValues(alpha: 0.8), fontSize: 13)),
         const SizedBox(height: 8),
         Row(
           crossAxisAlignment: CrossAxisAlignment.baseline,
@@ -42,11 +33,7 @@ class DataHeaderCard extends StatelessWidget {
           children: [
             Text(
               value,
-              style: TextStyle(
-                color: color,
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(color: color, fontSize: 28, fontWeight: FontWeight.bold),
             ),
             const SizedBox(width: 4),
             Text(unit, style: TextStyle(color: color, fontSize: 13)),
@@ -61,11 +48,7 @@ class DataHeaderCard extends StatelessWidget {
 class TrendChartCard extends StatelessWidget {
   final String rate;
   final List<TrendPoint> dataPoints;
-  const TrendChartCard({
-    super.key,
-    required this.rate,
-    required this.dataPoints,
-  });
+  const TrendChartCard({super.key, required this.rate, required this.dataPoints});
 
   @override
   Widget build(BuildContext context) {
@@ -75,9 +58,7 @@ class TrendChartCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10),
-        ],
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 10)],
       ),
       child: Column(
         children: [
@@ -86,38 +67,20 @@ class TrendChartCard extends StatelessWidget {
             children: [
               const Text(
                 '近期开播精进趋势',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF333333),
-                ),
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF333333)),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 4,
-                ),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFFDEEF1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(color: const Color(0xFFFDEEF1), borderRadius: BorderRadius.circular(12)),
                 child: Text(
                   rate,
-                  style: const TextStyle(
-                    color: Color(0xFFFF4D6A),
-                    fontSize: 11,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: const TextStyle(color: Color(0xFFFF4D6A), fontSize: 11, fontWeight: FontWeight.bold),
                 ),
               ),
             ],
           ),
           const SizedBox(height: 24),
-          SizedBox(
-            height: 120,
-            width: double.infinity,
-            child: LineChart(_buildChartData()),
-          ),
+          SizedBox(height: 120, width: double.infinity, child: LineChart(_buildChartData())),
         ],
       ),
     );
@@ -142,13 +105,8 @@ class TrendChartCard extends StatelessWidget {
             interval: 1,
             getTitlesWidget: (value, meta) {
               int index = value.toInt();
-              if (index >= 0 &&
-                  index < dataPoints.length &&
-                  dataPoints[index].label.isNotEmpty) {
-                return Text(
-                  dataPoints[index].label,
-                  style: const TextStyle(color: Colors.grey, fontSize: 10),
-                );
+              if (index >= 0 && index < dataPoints.length && dataPoints[index].label.isNotEmpty) {
+                return Text(dataPoints[index].label, style: const TextStyle(color: Colors.grey, fontSize: 10));
               }
               return const SizedBox.shrink();
             },
@@ -167,19 +125,12 @@ class TrendChartCard extends StatelessWidget {
             show: true,
             checkToShowDot: (spot, barData) => spot.y == 60, // 仅在最高点显示圆点
             getDotPainter: (spot, percent, barData, index) =>
-                FlDotCirclePainter(
-                  radius: 3,
-                  color: const Color(0xFFD4AF37),
-                  strokeWidth: 0,
-                ),
+                FlDotCirclePainter(radius: 3, color: const Color(0xFFD4AF37), strokeWidth: 0),
           ),
           belowBarData: BarAreaData(
             show: true,
             gradient: LinearGradient(
-              colors: [
-                const Color(0xFF8B2323).withOpacity(0.15),
-                const Color(0xFF8B2323).withOpacity(0.0),
-              ],
+              colors: [const Color(0xFF8B2323).withValues(alpha: 0.15), const Color(0xFF8B2323).withValues(alpha: 0.0)],
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
             ),
@@ -199,18 +150,12 @@ class HistoryItemTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-      ),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)),
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
         title: Text(
           record.title,
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
-            color: Color(0xFF4A2B11),
-          ),
+          style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF4A2B11)),
         ),
         subtitle: Padding(
           padding: const EdgeInsets.only(top: 4),
@@ -224,11 +169,7 @@ class HistoryItemTile extends StatelessWidget {
           children: [
             Text(
               "详细",
-              style: TextStyle(
-                color: Color(0xFFD4AF37),
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(color: Color(0xFFD4AF37), fontSize: 14, fontWeight: FontWeight.bold),
             ),
             Icon(Icons.arrow_forward, color: Color(0xFFD4AF37), size: 16),
           ],
@@ -256,17 +197,10 @@ class HistoryItemTile extends StatelessWidget {
             children: [
               Text(
                 record.title,
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF4A2B11),
-                ),
+                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF4A2B11)),
               ),
               const SizedBox(height: 8),
-              Text(
-                "场次日期：${record.fullDate}",
-                style: const TextStyle(color: Colors.grey, fontSize: 13),
-              ),
+              Text("场次日期：${record.fullDate}", style: const TextStyle(color: Colors.grey, fontSize: 13)),
               const SizedBox(height: 24),
               // 2x2 网格
               GridView.count(
@@ -292,17 +226,11 @@ class HistoryItemTile extends StatelessWidget {
                   onPressed: () => Navigator.pop(context),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF4A2B11),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),
                   child: const Text(
                     "知道了",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                 ),
               ),
@@ -319,10 +247,7 @@ class HistoryItemTile extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: const Color(0xFFD4AF37).withOpacity(0.4),
-          width: 1,
-        ), // 金色边框
+        border: Border.all(color: const Color(0xFFD4AF37).withValues(alpha: 0.4), width: 1), // 金色边框
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -331,11 +256,7 @@ class HistoryItemTile extends StatelessWidget {
           const SizedBox(height: 6),
           Text(
             value,
-            style: const TextStyle(
-              color: Color(0xFF4A2B11),
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
+            style: const TextStyle(color: Color(0xFF4A2B11), fontSize: 18, fontWeight: FontWeight.bold),
           ),
         ],
       ),

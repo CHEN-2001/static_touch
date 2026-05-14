@@ -39,11 +39,7 @@ class MineHeader extends StatelessWidget {
                   fit: BoxFit.cover,
                 ),
                 boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.05),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
+                  BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 4)),
                 ],
               ),
             ),
@@ -55,11 +51,7 @@ class MineHeader extends StatelessWidget {
                 children: [
                   Text(
                     user.nickName.isEmpty ? '未登录' : user.nickName,
-                    style: const TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF4A2B2B),
-                    ),
+                    style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Color(0xFF4A2B2B)),
                   ),
                   const SizedBox(height: 6),
                   Text(
@@ -72,11 +64,7 @@ class MineHeader extends StatelessWidget {
               ),
             ),
             // 🚀 加回跳转引导符号
-            const Icon(
-              Icons.arrow_forward_ios_rounded,
-              color: Colors.black12,
-              size: 16,
-            ),
+            const Icon(Icons.arrow_forward_ios_rounded, color: Colors.black12, size: 16),
           ],
         ),
       ),
@@ -102,13 +90,7 @@ class MineMenuList extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
-            blurRadius: 15,
-            offset: const Offset(0, 5),
-          ),
-        ],
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 15, offset: const Offset(0, 5))],
       ),
       child: Column(
         children: List.generate(menus.length, (index) {
@@ -121,10 +103,7 @@ class MineMenuList extends StatelessWidget {
                 context.push(item.route);
               } else {
                 // 兜底提示
-                context.showAppToast(
-                  message: "该功能即将上线，敬请期待",
-                  type: AppToastType.warning,
-                );
+                context.showAppToast(message: "该功能即将上线，敬请期待", type: AppToastType.warning);
               }
             },
             borderRadius: BorderRadius.vertical(
@@ -136,12 +115,7 @@ class MineMenuList extends StatelessWidget {
               decoration: BoxDecoration(
                 border: isLast
                     ? null
-                    : Border(
-                        bottom: BorderSide(
-                          color: Colors.grey.withValues(alpha: 0.1),
-                          width: 0.5,
-                        ),
-                      ),
+                    : Border(bottom: BorderSide(color: Colors.grey.withValues(alpha: 0.1), width: 0.5)),
               ),
               child: Row(
                 children: [
@@ -150,23 +124,63 @@ class MineMenuList extends StatelessWidget {
                   Expanded(
                     child: Text(
                       item.title,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        color: Color(0xFF333333),
-                        fontWeight: FontWeight.w500,
-                      ),
+                      style: const TextStyle(fontSize: 16, color: Color(0xFF333333), fontWeight: FontWeight.w500),
                     ),
                   ),
-                  const Icon(
-                    Icons.arrow_forward_ios_rounded,
-                    color: Colors.black26,
-                    size: 14,
-                  ),
+                  const Icon(Icons.arrow_forward_ios_rounded, color: Colors.black26, size: 14),
                 ],
               ),
             ),
           );
         }),
+      ),
+    );
+  }
+}
+
+class MineVipEntryCard extends StatelessWidget {
+  const MineVipEntryCard({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        gradient: const LinearGradient(
+          colors: [Color(0xFF3D2F24), Color(0xFF1A1512)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () => context.push(AppRoutes.vip),
+          borderRadius: BorderRadius.circular(16),
+          child: const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+            child: Row(
+              children: [
+                Icon(Icons.workspace_premium, color: Color(0xFFD4AF37), size: 24),
+                SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "尊享会员",
+                        style: TextStyle(color: Color(0xFFD4AF37), fontWeight: FontWeight.bold, fontSize: 16),
+                      ),
+                      Text("解锁全部精进回放", style: TextStyle(color: Colors.white54, fontSize: 12)),
+                    ],
+                  ),
+                ),
+                Icon(Icons.arrow_forward_ios, color: Colors.white24, size: 14),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

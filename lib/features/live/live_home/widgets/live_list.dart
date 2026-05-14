@@ -5,14 +5,14 @@ import 'package:static_touch/routes/app_router.dart';
 import 'package:static_touch/shared/enum/live_status_enum.dart';
 import 'package:static_touch/shared/models/live/live_item_model.dart';
 import 'package:static_touch/shared/providers/live_state_provider.dart';
+import 'package:static_touch/shared/widgets/app_dialogs.dart'; // 🚀 引入弹窗用于未开始提示
 import '../live_provider.dart';
 
 class LiveList extends StatelessWidget {
-  const LiveList({super.key});
+  const LiveList({super.key}); // 🚀 恢复无参构造，完美兼容你的 live_page.dart
 
-  // 🚀 新增：触发全局直播数据的静默刷新
+  // 触发全局直播数据的静默刷新
   Future<void> _onRefresh(BuildContext context) async {
-    // 无论在哪个 Tab 下拉，统一刷新全局数据池
     await context.read<LiveStateProvider>().refreshLiveList();
   }
 
@@ -39,13 +39,11 @@ class LiveList extends StatelessWidget {
         items = allItems;
     }
 
-    // 🚀 核心交互重构：只在列表区域套用下拉刷新
     return RefreshIndicator(
       color: const Color(0xFF8B2323),
       backgroundColor: Colors.white,
       onRefresh: () => _onRefresh(context),
       child: items.isEmpty
-          // 🚀 细节优化：如果某个分类下没有数据，展示空状态，且依然保持可下拉刷新的能力！
           ? LayoutBuilder(
               builder: (context, constraints) => ListView(
                 physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
@@ -65,9 +63,7 @@ class LiveList extends StatelessWidget {
                 ],
               ),
             )
-          // 正常展示列表
           : ListView.builder(
-              // 🚀 关键：即使数据只有一条不满一屏，也能强行拽下来刷新
               physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
               itemCount: items.length,
@@ -87,9 +83,14 @@ class _LiveCardItem extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 20),
       child: InkWell(
         onTap: () {
+          // 🚀 核心修复：严格遵循 PRD 文档的路由分发逻辑
           if (item.status == LiveStatus.live) {
             context.push(AppRoutes.liveDetail);
+          } else if (item.status == LiveStatus.preparing) {
+            // 🚀 未开始：只弹提示，不乱跳转
+            context.showAppToast(message: "直播尚未开始，已为您设置开播提醒", type: AppToastType.info);
           } else {
+            // 🚀 回放：带上参数跳详情
             context.push(AppRoutes.meditationDetail, extra: item);
           }
         },
@@ -99,7 +100,10 @@ class _LiveCardItem extends StatelessWidget {
           decoration: BoxDecoration(
             color: Colors.black,
             borderRadius: BorderRadius.circular(16),
-            boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, 5))],
+            // 🚀 拥抱 withValues 新语法
+            boxShadow: [
+              BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 10, offset: const Offset(0, 5)),
+            ],
           ),
           clipBehavior: Clip.antiAlias,
           child: Stack(

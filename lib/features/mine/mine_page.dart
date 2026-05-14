@@ -33,6 +33,7 @@ class _MinePageState extends State<MinePage> with AutomaticKeepAliveClientMixin 
               delegate: SliverChildListDelegate([
                 const SizedBox(height: 10),
                 const MineHeader(),
+                const MineVipEntryCard(),
                 const SizedBox(height: 20),
                 const MineMenuList(),
                 const SizedBox(height: 40),

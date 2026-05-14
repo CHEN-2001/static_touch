@@ -15,7 +15,6 @@ class _LivePreparePageState extends State<LivePreparePage> {
   @override
   void initState() {
     super.initState();
-    // 确保组件渲染后初始化相机
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<LivePrepareProvider>().initCamera();
     });
@@ -28,10 +27,9 @@ class _LivePreparePageState extends State<LivePreparePage> {
       body: Consumer<LivePrepareProvider>(
         builder: (context, p, child) {
           return Stack(
-            fit: StackFit.expand, // 强制 Stack 撑满全屏
+            fit: StackFit.expand,
             children: [
               // 1. 底层：相机预览
-              // 🚀 核心修复 3：强制转为 CameraController，满足 Flutter 严格的类型检查
               if (p.controller != null && (p.controller as CameraController).value.isInitialized)
                 Center(
                   child: Transform(
@@ -47,7 +45,6 @@ class _LivePreparePageState extends State<LivePreparePage> {
               SafeArea(
                 child: Column(
                   children: [
-                    // 顶部返回
                     Align(
                       alignment: Alignment.topLeft,
                       child: IconButton(
@@ -55,27 +52,30 @@ class _LivePreparePageState extends State<LivePreparePage> {
                         onPressed: () => Navigator.pop(context),
                       ),
                     ),
-
-                    // 右侧工具栏
                     const Align(alignment: Alignment.topRight, child: LivePrepareToolbar()),
-
                     const Spacer(),
 
-                    // 底部开启按钮
+                    // 🚀 核心修复：绑定真实的提交逻辑与 Loading 动画
                     Padding(
                       padding: const EdgeInsets.only(bottom: 50),
                       child: ElevatedButton(
-                        onPressed: () => debugPrint('开启直播，麦克风状态: ${p.isMicOn}'),
+                        onPressed: p.isLoading ? null : () => p.startBroadcast(context),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFFFF4D6A),
                           padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                           elevation: 8,
                         ),
-                        child: const Text(
-                          '开启直播',
-                          style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
-                        ),
+                        child: p.isLoading
+                            ? const SizedBox(
+                                width: 24,
+                                height: 24,
+                                child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                              )
+                            : const Text(
+                                '开启直播',
+                                style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                              ),
                       ),
                     ),
                   ],

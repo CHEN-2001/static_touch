@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:static_touch/core/navigation/nav_service.dart';
 
-enum AppToastType { success, error, warning }
+// 🚀 1. 补齐 info 枚举
+enum AppToastType { success, error, warning, info }
 
 enum AppToastPosition { top, center, bottom }
 
-// 全局单例 Toast 记录器，防止狂点造成的 UI 叠加重影和 GPU 掉帧
 OverlayEntry? _currentToastEntry;
 
 extension AppDialogExtension on BuildContext {
-  // 核心对话框 (Dialog)
   Future<bool?> showAppDialog({
     required String title,
     required String content,
@@ -41,14 +40,12 @@ extension AppDialogExtension on BuildContext {
     );
   }
 
-  // 核心提示框 (Toast) - 采用 Overlay 高性能悬浮层
   void showAppToast({
     required String message,
     required AppToastType type,
     AppToastPosition position = AppToastPosition.center,
     Duration duration = const Duration(seconds: 2),
   }) {
-    // 1. 匹配视觉配置
     IconData iconData;
     Color iconColor;
     Color bgColor;
@@ -69,12 +66,16 @@ extension AppDialogExtension on BuildContext {
         iconColor = const Color(0xFFDA8B33);
         bgColor = const Color(0xFFFFF8EE);
         break;
+      // 🚀 2. 补齐 info 的视觉配置（静谧蓝灰色）
+      case AppToastType.info:
+        iconData = Icons.info_outline;
+        iconColor = const Color(0xFF5B7A8C);
+        bgColor = const Color(0xFFF0F4F8);
+        break;
     }
 
-    // 2. 计算位置
     Alignment alignment;
     EdgeInsets margin;
-
     final bottomPadding = MediaQuery.of(this).viewInsets.bottom;
 
     switch (position) {
@@ -92,11 +93,9 @@ extension AppDialogExtension on BuildContext {
         break;
     }
 
-    // 构建悬浮层
     final overlayState = Overlay.maybeOf(this) ?? NavService.rootNavigatorKey.currentState?.overlay;
-
     if (overlayState == null) return;
-    // 如果当前屏幕上已经有 Toast，立刻移除它，保证永远只有一个 Toast 存在
+
     if (_currentToastEntry != null && _currentToastEntry!.mounted) {
       _currentToastEntry!.remove();
       _currentToastEntry = null;
@@ -116,6 +115,7 @@ extension AppDialogExtension on BuildContext {
                   decoration: BoxDecoration(
                     color: bgColor,
                     borderRadius: BorderRadius.circular(10),
+                    // 🚀 3. 规范替换为 withValues(alpha: x)
                     border: Border.all(color: iconColor.withValues(alpha: 0.2)),
                     boxShadow: [
                       BoxShadow(
@@ -146,11 +146,9 @@ extension AppDialogExtension on BuildContext {
       },
     );
 
-    // 4. 插入屏幕并延时移除
     overlayState.insert(_currentToastEntry!);
 
     Future.delayed(duration, () {
-      // 🚀 核心优化：只有当要移除的依然是自己时，才执行移除（防止把刚弹出的新 Toast 误删）
       if (_currentToastEntry != null && _currentToastEntry!.mounted) {
         _currentToastEntry!.remove();
         _currentToastEntry = null;

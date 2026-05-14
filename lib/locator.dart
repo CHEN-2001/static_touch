@@ -4,9 +4,9 @@ import 'package:static_touch/shared/repositories/user_repository.dart';
 import 'package:static_touch/shared/repositories/live_repository.dart';
 import 'package:static_touch/shared/repositories/stats_repository.dart';
 import 'package:static_touch/shared/repositories/collection_repository.dart';
-// 业务仓库
 import 'package:static_touch/features/auth/auth_repository.dart';
 import 'package:static_touch/shared/repositories/nfc_repository.dart';
+import 'package:static_touch/shared/repositories/vip_repository.dart';
 
 final locator = GetIt.instance;
 
@@ -15,26 +15,18 @@ void setupLocator() {
   locator.registerLazySingleton<HttpClient>(() => HttpClient());
 
   // 注册公共用户仓库
-  locator.registerLazySingleton<UserRepository>(
-    () => UserRepository(locator()),
-  );
-  locator.registerLazySingleton<LiveRepository>(
-    () => LiveRepository(locator()),
-  );
+  locator.registerLazySingleton<UserRepository>(() => UserRepository(locator()));
+  locator.registerLazySingleton<LiveRepository>(() => LiveRepository(locator()));
 
   // 注册修行数据仓储
-  locator.registerLazySingleton<StatsRepository>(
-    () => StatsRepository(locator()),
-  );
+  locator.registerLazySingleton<StatsRepository>(() => StatsRepository(locator()));
 
   // 注册auth仓库
-  locator.registerLazySingleton<AuthRepository>(
-    () => AuthRepository(locator()),
-  );
+  locator.registerLazySingleton<AuthRepository>(() => AuthRepository(locator()));
   //注册收藏仓库
-  locator.registerLazySingleton<CollectionRepository>(
-    () => CollectionRepository(locator()),
-  );
+  locator.registerLazySingleton<CollectionRepository>(() => CollectionRepository(locator()));
   // 注册NFC仓库
   locator.registerLazySingleton<NfcRepository>(() => NfcRepository(locator()));
+  // 注册VIP仓库
+  locator.registerLazySingleton<VipRepository>(() => VipRepository(locator()));
 }

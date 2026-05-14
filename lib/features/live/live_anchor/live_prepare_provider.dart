@@ -3,17 +3,17 @@ import 'package:camera/camera.dart';
 import 'package:static_touch/locator.dart';
 import 'package:static_touch/shared/repositories/live_repository.dart';
 import 'package:static_touch/shared/widgets/app_dialogs.dart';
+import 'package:static_touch/shared/providers/base_provider.dart'; // 🚀 引入基类
 
-class LivePrepareProvider extends ChangeNotifier {
+class LivePrepareProvider extends BaseProvider {
+  // 🚀 继承基类
   CameraController? _controller;
   CameraController? get controller => _controller;
 
   List<CameraDescription> _cameras = [];
   bool _isMicOn = true;
   bool _isMirror = false;
-  bool _isPublishing = false;
 
-  bool get isPublishing => _isPublishing;
   bool get isMicOn => _isMicOn;
   bool get isMirror => _isMirror;
 
@@ -59,10 +59,11 @@ class LivePrepareProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  // 🚀 接入真实的业务逻辑与 Loading 状态
   Future<void> startBroadcast(BuildContext context) async {
     if (_controller == null || !_controller!.value.isInitialized) return;
-    _isPublishing = true;
-    notifyListeners();
+
+    setLoading(true); // 🚀 触发基类的转圈状态
 
     final repo = locator<LiveRepository>();
     final result = await repo.createLiveRoom("我的静心直播");
@@ -72,11 +73,10 @@ class LivePrepareProvider extends ChangeNotifier {
     if (result.status) {
       context.showAppToast(message: "开播成功，推流中...", type: AppToastType.success);
     } else {
-      context.showAppToast(message: result.message, type: AppToastType.error);
+      setError(result.message); // 🚀 触发基类的红色错误 Toast
     }
 
-    _isPublishing = false;
-    notifyListeners();
+    setLoading(false);
   }
 
   @override

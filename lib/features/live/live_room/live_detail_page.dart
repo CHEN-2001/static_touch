@@ -15,6 +15,15 @@ class LiveDetailPage extends StatefulWidget {
 class _LiveDetailPageState extends State<LiveDetailPage> {
   final TextEditingController _inputController = TextEditingController();
   final FocusNode _focusNode = FocusNode();
+  @override
+  void initState() {
+    super.initState();
+    // 🚀 核心修复：页面加载后，立即调用 enterRoom 方法
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // 因为现在是测试阶段，我们先写死进入房间 '123456'
+      context.read<LiveDetailProvider>().enterRoom('123456');
+    });
+  }
 
   @override
   void dispose() {

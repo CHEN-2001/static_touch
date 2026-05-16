@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:camera/camera.dart';
+import 'package:apivideo_live_stream/apivideo_live_stream.dart';
 import 'widgets/live_prepare_toolbar.dart';
 import 'live_prepare_provider.dart';
 
@@ -29,19 +29,19 @@ class _LivePreparePageState extends State<LivePreparePage> {
           return Stack(
             fit: StackFit.expand,
             children: [
-              // 1. 底层：相机预览
-              if (p.controller != null && (p.controller as CameraController).value.isInitialized)
+              // 渲染层：底层引擎画面输出
+              if (p.controller != null)
                 Center(
                   child: Transform(
                     alignment: Alignment.center,
                     transform: Matrix4.rotationY(p.isMirror ? 3.14159 : 0),
-                    child: CameraPreview(p.controller as CameraController),
+                    child: ApiVideoCameraPreview(controller: p.controller!),
                   ),
                 )
               else
                 const Center(child: CircularProgressIndicator(color: Colors.white24)),
 
-              // 2. 顶层：控制 UI
+              // 交互层：控制遮罩与操作流
               SafeArea(
                 child: Column(
                   children: [
@@ -55,13 +55,12 @@ class _LivePreparePageState extends State<LivePreparePage> {
                     const Align(alignment: Alignment.topRight, child: LivePrepareToolbar()),
                     const Spacer(),
 
-                    // 🚀 核心修复：绑定真实的提交逻辑与 Loading 动画
                     Padding(
                       padding: const EdgeInsets.only(bottom: 50),
                       child: ElevatedButton(
                         onPressed: p.isLoading ? null : () => p.startBroadcast(context),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFFF4D6A),
+                          backgroundColor: p.isStreaming ? Colors.grey : const Color(0xFFFF4D6A),
                           padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                           elevation: 8,
@@ -72,9 +71,9 @@ class _LivePreparePageState extends State<LivePreparePage> {
                                 height: 24,
                                 child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
                               )
-                            : const Text(
-                                '开启直播',
-                                style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                            : Text(
+                                p.isStreaming ? '结束直播' : '开启直播',
+                                style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
                               ),
                       ),
                     ),

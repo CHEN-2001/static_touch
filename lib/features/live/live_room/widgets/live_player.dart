@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:static_touch/shared/widgets/app_dialogs.dart';
+import 'package:media_kit_video/media_kit_video.dart'; // 🚀 引入视频 UI
 import '../live_detail_provider.dart';
 
 class LivePlayer extends StatefulWidget {
@@ -11,12 +12,11 @@ class LivePlayer extends StatefulWidget {
 }
 
 class _LivePlayerState extends State<LivePlayer> {
-  bool _showControls = false; // 严格落实 PRD: 控制栏显示/隐藏状态
+  bool _showControls = false;
 
   @override
   Widget build(BuildContext context) {
     final p = context.watch<LiveDetailProvider>();
-    final url = p.pullUrl;
 
     return AspectRatio(
       aspectRatio: 16 / 9,
@@ -29,7 +29,7 @@ class _LivePlayerState extends State<LivePlayer> {
         child: Stack(
           fit: StackFit.expand,
           children: [
-            // 1. 底层：视频流或纯音频占位
+            // 1. 底层：真正的视频流渲染！
             Container(
               color: Colors.black,
               alignment: Alignment.center,
@@ -42,17 +42,18 @@ class _LivePlayerState extends State<LivePlayer> {
                         Text("純淨音頻模式運行中", style: TextStyle(color: Colors.white70, fontSize: 12)),
                       ],
                     )
-                  : Text(
-                      url == null ? '播放地址獲取失敗' : '視頻流渲染中...\n$url',
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(color: Colors.white70),
+                  : Video(
+                      // 🚀 丢入控制器，开始渲染画面
+                      controller: p.videoController,
+                      controls: NoVideoControls, // 隐藏默认进度条，用我们自己的UI
+                      fit: BoxFit.contain, // 保持画面比例
                     ),
             ),
 
             // 2. 顶层：播放器控制栏 (仅在点击时显示)
             if (_showControls)
               Container(
-                color: Colors.black.withValues(alpha: 0.5),
+                color: Colors.black.withOpacity(0.5),
                 child: Stack(
                   children: [
                     // 播放/暂停

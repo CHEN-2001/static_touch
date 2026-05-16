@@ -16,9 +16,7 @@ class LiveRepository {
     if (!isMock) {
       final result = await _client.get('/live/list');
       if (result.status && result.data is List) {
-        return (result.data as List)
-            .map((e) => LiveItemModel.fromJson(e))
-            .toList();
+        return (result.data as List).map((e) => LiveItemModel.fromJson(e)).toList();
       }
       return [];
     }
@@ -61,15 +59,34 @@ class LiveRepository {
   Stream<LiveItemModel> listenLiveUpdates() async* {}
 
   // 主播创建直播间
+  // Future<ResultEntity<String>> createLiveRoom(String title) async {
+  //   await Future.delayed(const Duration(seconds: 1));
+  //   return ResultEntity(status: true, message: '创建成功', data: 'rtmp://test');
+  // }
+
+  // // 观众进入直播间
+  // Future<ResultEntity<String>> enterLiveRoom(String roomId) async {
+  //   await Future.delayed(const Duration(seconds: 1));
+  //   return ResultEntity(status: true, message: '进入成功', data: 'http://test.flv');
+  // }
+  // 主播创建直播间 (推流端)
   Future<ResultEntity<String>> createLiveRoom(String title) async {
     await Future.delayed(const Duration(seconds: 1));
-    return ResultEntity(status: true, message: '创建成功', data: 'rtmp://test');
+
+    // 🚀 写死你的真实服务器 IP 和推流码 123456
+    String myPushUrl = 'rtmp://47.92.105.53/:1935/live/123456';
+
+    return ResultEntity(status: true, message: '创建成功', data: myPushUrl);
   }
 
-  // 观众进入直播间
+  // 观众进入直播间 (拉流端)
   Future<ResultEntity<String>> enterLiveRoom(String roomId) async {
     await Future.delayed(const Duration(seconds: 1));
-    return ResultEntity(status: true, message: '进入成功', data: 'http://test.flv');
+
+    // 🚀 写死你的真实服务器 IP 和播放码 123456
+    String myPullUrl = 'http://47.92.105.53:8080/live/123456.flv';
+
+    return ResultEntity(status: true, message: '进入成功', data: myPullUrl);
   }
 
   // 🚀 主播获取直播数据统计 (更新了数据结构以支持图表和弹窗)

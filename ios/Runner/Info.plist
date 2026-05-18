@@ -4,13 +4,28 @@
 	<dict>
 		<!-- NFC -->
 		<key>NFCReaderUsageDescription</key>
-		<string>我们需要使用 NFC 来读取标签信息以完成登录或绑定</string>
+		<string>我们需要使用 NFC 来读取标签信息以完成登录或绑定账号</string>
 		<key>com.apple.developer.nfc.readersession.formats</key>
 		<array>
 			<string>NDEF</string>
 			<string>TAG</string>
 		</array>
 		<!-- NFC -->
+		<!-- 媒体 -->
+		<key>NSCameraUsageDescription</key>
+    	<string>静触需要您的同意，才能使用摄像头进行静心直播</string>
+    	<key>NSMicrophoneUsageDescription</key>
+    	<string>静触需要您的同意，才能使用麦克风采集您的直播声音</string>
+    	<key>NSAppTransportSecurity</key>
+    	<dict>
+        <key>NSAllowsArbitraryLoads</key>
+        <true/>
+    	</dict>
+		<!-- 媒体 -->
+		<!-- 相册访问 -->
+		<key>NSPhotoLibraryUsageDescription</key>
+        <string>静触需要您的同意，才能访问相册以修改您的个人头像</string>
+		<!-- 相册访问 -->
 		<key>CADisableMinimumFrameDurationOnPhone</key>
 		<true />
 		<key>CFBundleDevelopmentRegion</key>

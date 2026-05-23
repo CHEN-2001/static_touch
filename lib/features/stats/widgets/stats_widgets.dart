@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:static_touch/shared/models/stats/stats_model.dart'; // 🚀 引入正规模型
+import 'package:static_touch/shared/models/stats/meditation_stats_model.dart'; // 🚀 引入正规模型
 
 // ================= 四宫格卡片组件 =================
 class StatCard extends StatelessWidget {
@@ -7,12 +7,7 @@ class StatCard extends StatelessWidget {
   final String value;
   final String unit;
 
-  const StatCard({
-    super.key,
-    required this.title,
-    required this.value,
-    required this.unit,
-  });
+  const StatCard({super.key, required this.title, required this.value, required this.unit});
 
   @override
   Widget build(BuildContext context) {
@@ -36,11 +31,7 @@ class StatCard extends StatelessWidget {
               children: [
                 TextSpan(
                   text: value,
-                  style: const TextStyle(
-                    color: valueColor,
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: const TextStyle(color: valueColor, fontSize: 24, fontWeight: FontWeight.bold),
                 ),
                 TextSpan(
                   text: ' $unit',
@@ -57,7 +48,7 @@ class StatCard extends StatelessWidget {
 
 // ================= 趋势图表组件 =================
 class TrendChart extends StatelessWidget {
-  final List<ChartData> trendData;
+  final List<WeeklyTrendModel> trendData;
   const TrendChart({super.key, required this.trendData});
 
   @override
@@ -73,11 +64,18 @@ class TrendChart extends StatelessWidget {
     );
   }
 
-  Widget _buildBar(BuildContext context, ChartData data) {
+  Widget _buildBar(BuildContext context, WeeklyTrendModel data) {
     const Color activeColor = Color(0xFF8B2323);
     const Color goldColor = Color(0xFFD4AF37);
 
     double heightRatio = (data.minutes / 100).clamp(0.2, 1.0);
+
+    final now = DateTime.now();
+
+    final String todayStr = '${now.month.toString().padLeft(2, '0')}.${now.day.toString().padLeft(2, '0')}';
+
+    bool isToday = (data.date == todayStr) || (data.date == '今日');
+    // ===================================================
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.end,
@@ -87,16 +85,17 @@ class TrendChart extends StatelessWidget {
           height: 100 * heightRatio,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(8),
-            color: data.isToday ? activeColor : goldColor.withOpacity(0.4),
+            color: isToday ? activeColor : goldColor.withValues(alpha: 0.4), // 👈 使用 isToday 决定颜色
           ),
         ),
         const SizedBox(height: 10),
         Text(
-          data.label,
+          // 如果是今天，UI 上可以强制显示为 "今日"，否则显示后端传来的日期
+          isToday ? '今日' : data.date,
           style: TextStyle(
             fontSize: 11,
-            color: data.isToday ? activeColor : Colors.grey,
-            fontWeight: data.isToday ? FontWeight.bold : FontWeight.normal,
+            color: isToday ? activeColor : Colors.grey,
+            fontWeight: isToday ? FontWeight.bold : FontWeight.normal,
           ),
         ),
       ],
@@ -110,12 +109,7 @@ class AchievementMedal extends StatelessWidget {
   final IconData? icon;
   final bool isUnlocked;
 
-  const AchievementMedal({
-    super.key,
-    required this.label,
-    this.icon,
-    required this.isUnlocked,
-  });
+  const AchievementMedal({super.key, required this.label, this.icon, required this.isUnlocked});
 
   @override
   Widget build(BuildContext context) {
@@ -132,11 +126,7 @@ class AchievementMedal extends StatelessWidget {
             border: Border.all(color: medalColor.withOpacity(0.5), width: 2),
           ),
           child: isUnlocked
-              ? Icon(
-                  icon ?? Icons.workspace_premium,
-                  color: medalColor,
-                  size: 30,
-                )
+              ? Icon(icon ?? Icons.workspace_premium, color: medalColor, size: 30)
               : const Center(
                   child: Text(
                     '未解\n锁',

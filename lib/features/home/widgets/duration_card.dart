@@ -22,7 +22,7 @@ class DurationCard extends StatelessWidget {
         border: Border.all(color: borderColor),
       ),
       child: InkWell(
-        onTap: () => context.push(AppRoutes.stats), // 修复常量路由
+        onTap: () => context.push(AppRoutes.stats),
         child: Padding(
           padding: const EdgeInsets.all(20),
           child: Row(

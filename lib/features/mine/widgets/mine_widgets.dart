@@ -50,7 +50,7 @@ class MineHeader extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    user.nickName.isEmpty ? '未登录' : user.nickName,
+                    user.nickname.isEmpty ? '未登录' : user.nickname,
                     style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Color(0xFF4A2B2B)),
                   ),
                   const SizedBox(height: 6),
@@ -79,11 +79,11 @@ class MineMenuList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // 🚀 获取当前用户是否为主播权限，用于动态过滤菜单项
-    final isAnchor = context.select((UserStateProvider p) => p.user.isAnchor);
+    final isLive = context.select((UserStateProvider p) => p.user.role != 2);
     final provider = context.read<MineProvider>();
 
     // 🚀 从 MineProvider 获取过滤后的可见菜单
-    final menus = provider.getVisibleMenus(isAnchor);
+    final menus = provider.getVisibleMenus(isLive);
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 20),

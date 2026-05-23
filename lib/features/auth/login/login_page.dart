@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:static_touch/shared/widgets/scale_button.dart';
-import 'package:static_touch/features/auth/login_provider.dart';
-import 'package:static_touch/features/auth/widgets/login_logo.dart';
-import 'package:static_touch/features/auth/widgets/forms/login_account_form.dart';
-import 'package:static_touch/features/auth/widgets/forms/login_nfc_view.dart';
-import 'package:static_touch/features/auth/widgets/login_privacy_policy.dart';
-import 'package:static_touch/shared/theme/app_colors.dart'; // 💡 引入主题规范
+import 'package:static_touch/features/auth/login/login_provider.dart';
+import 'package:static_touch/features/auth/login/widgets/login_logo.dart';
+import 'package:static_touch/features/auth/login/widgets/forms/login_account_form.dart';
+import 'package:static_touch/features/auth/login/widgets/forms/login_nfc_view.dart';
+import 'package:static_touch/features/auth/login/widgets/login_privacy_policy.dart';
+import 'package:static_touch/shared/theme/app_colors.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});

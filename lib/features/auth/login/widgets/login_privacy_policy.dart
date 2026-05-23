@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:static_touch/features/auth/login_provider.dart';
+import 'package:static_touch/features/auth/login/login_provider.dart';
 
 class LoginPrivacyPolicy extends StatelessWidget {
   const LoginPrivacyPolicy({super.key});

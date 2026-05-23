@@ -3,8 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:static_touch/shared/widgets/app_dialogs.dart';
 import 'package:static_touch/shared/widgets/scale_button.dart';
-import 'package:static_touch/features/auth/login_provider.dart';
-import 'package:static_touch/features/auth/widgets/login_input.dart';
+import 'package:static_touch/features/auth/login/login_provider.dart';
+import 'package:static_touch/features/auth/login/widgets/login_input.dart';
 import 'package:static_touch/shared/theme/app_colors.dart';
 import 'package:static_touch/routes/app_router.dart';
 
@@ -26,7 +26,6 @@ class _LoginAccountFormState extends State<LoginAccountForm> {
     super.dispose();
   }
 
-  // 🚀 极简的点击事件
   Future<void> _handleLogin() async {
     FocusManager.instance.primaryFocus?.unfocus();
 
@@ -43,7 +42,6 @@ class _LoginAccountFormState extends State<LoginAccountForm> {
       return;
     }
 
-    // UI 只管下发指令并接收是否成功的布尔值
     final success = await provider.login(_accCtrl.text.trim(), _pwdCtrl.text.trim());
 
     if (success && mounted) {
@@ -99,11 +97,11 @@ class _LoginAccountFormState extends State<LoginAccountForm> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             ScaleButton(
-              onTap: () {},
+              onTap: () => context.push(AppRoutes.register), // 跳转到注册页面
               child: const Text('注册账号', style: TextStyle(color: Colors.grey, fontSize: 14)),
             ),
             ScaleButton(
-              onTap: () {},
+              onTap: () => context.push(AppRoutes.resetPassword), // 跳转到忘记密码页面
               child: const Text('忘记密码？', style: TextStyle(color: Colors.grey, fontSize: 14)),
             ),
           ],

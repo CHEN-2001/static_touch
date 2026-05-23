@@ -20,7 +20,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
   void initState() {
     super.initState();
     final user = context.read<UserStateProvider>().user;
-    _nameCtrl = TextEditingController(text: user.nickName);
+    _nameCtrl = TextEditingController(text: user.nickname);
     _quoteCtrl = TextEditingController(text: user.dailyQuote);
   }
 
@@ -32,16 +32,11 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
   }
 
   // 🚀 呼出底部选择菜单
-  void _showImageSourceActionSheet(
-    BuildContext context,
-    ProfileEditProvider p,
-  ) {
+  void _showImageSourceActionSheet(BuildContext context, ProfileEditProvider p) {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
       builder: (BuildContext safeContext) {
         return SafeArea(
           child: Column(
@@ -57,10 +52,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
               ),
               const Divider(height: 1),
               ListTile(
-                leading: const Icon(
-                  Icons.photo_library,
-                  color: Color(0xFF4A2B11),
-                ),
+                leading: const Icon(Icons.photo_library, color: Color(0xFF4A2B11)),
                 title: const Text('从相册选择', style: TextStyle(fontSize: 16)),
                 onTap: () {
                   Navigator.pop(safeContext);
@@ -70,10 +62,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
               Container(height: 8, color: const Color(0xFFF5F5F5)),
               ListTile(
                 title: const Center(
-                  child: Text(
-                    '取消',
-                    style: TextStyle(fontSize: 16, color: Colors.grey),
-                  ),
+                  child: Text('取消', style: TextStyle(fontSize: 16, color: Colors.grey)),
                 ),
                 onTap: () => Navigator.pop(safeContext),
               ),
@@ -93,11 +82,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
       appBar: AppBar(
         title: const Text(
           "资料修改",
-          style: TextStyle(
-            color: Color(0xFF4A2B11),
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
-          ),
+          style: TextStyle(color: Color(0xFF4A2B11), fontWeight: FontWeight.bold, fontSize: 18),
         ),
         backgroundColor: Colors.white,
         elevation: 0,
@@ -107,25 +92,15 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
             onPressed: p.isLoading
                 ? null
                 : () async {
-                    final success = await p.saveProfile(
-                      context,
-                      nickName: _nameCtrl.text,
-                      dailyQuote: _quoteCtrl.text,
-                    );
+                    final success = await p.saveProfile(context, nickname: _nameCtrl.text, dailyQuote: _quoteCtrl.text);
                     if (success && mounted) {
-                      context.showAppToast(
-                        message: "修改成功",
-                        type: AppToastType.success,
-                      );
+                      context.showAppToast(message: "修改成功", type: AppToastType.success);
                       Navigator.pop(context);
                     }
                   },
             child: Text(
               p.isLoading ? "提交中" : "保存",
-              style: const TextStyle(
-                color: Color(0xFF8B2323),
-                fontWeight: FontWeight.bold,
-              ),
+              style: const TextStyle(color: Color(0xFF8B2323), fontWeight: FontWeight.bold),
             ),
           ),
         ],
@@ -158,13 +133,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
               color: Colors.white,
               shape: BoxShape.circle,
               border: Border.all(color: const Color(0xFFE5D5C5), width: 3),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
-                  blurRadius: 10,
-                  offset: const Offset(0, 5),
-                ),
-              ],
+              boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 5))],
               image: DecorationImage(
                 // 🚀 核心逻辑：如果选中了新图片，使用 FileImage 读取真实文件；否则使用默认占位图
                 image: hasNewAvatar
@@ -188,12 +157,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
     );
   }
 
-  Widget _buildInputTile(
-    String label,
-    TextEditingController ctrl,
-    String hint, {
-    int maxLines = 1,
-  }) {
+  Widget _buildInputTile(String label, TextEditingController ctrl, String hint, {int maxLines = 1}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -207,14 +171,8 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
             hintText: hint,
             filled: true,
             fillColor: Colors.white,
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 16,
-              vertical: 12,
-            ),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide.none,
-            ),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
           ),
         ),
       ],

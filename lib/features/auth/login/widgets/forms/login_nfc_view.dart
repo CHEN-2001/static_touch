@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:static_touch/features/auth/login_provider.dart';
-import 'package:static_touch/features/auth/widgets/ripple_animation.dart';
+import 'package:static_touch/features/auth/login/login_provider.dart';
+import 'package:static_touch/features/auth/login/widgets/ripple_animation.dart';
 import 'package:static_touch/features/nfc/nfc_service.dart';
 import 'package:go_router/go_router.dart';
 import 'package:static_touch/routes/app_router.dart';

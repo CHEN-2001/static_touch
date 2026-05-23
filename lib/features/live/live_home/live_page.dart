@@ -20,7 +20,7 @@ class _LivePageState extends State<LivePage> with AutomaticKeepAliveClientMixin 
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    final isAnchor = context.select((UserStateProvider p) => p.user.isAnchor);
+    final isLive = context.select((UserStateProvider p) => p.user.role != 2);
 
     return Scaffold(
       backgroundColor: const Color(0xfffdfbf7),
@@ -33,7 +33,7 @@ class _LivePageState extends State<LivePage> with AutomaticKeepAliveClientMixin 
           ],
         ),
       ),
-      floatingActionButton: isAnchor
+      floatingActionButton: isLive
           ? FloatingActionButton.extended(
               onPressed: () => context.push(AppRoutes.livePrepare),
               backgroundColor: const Color(0xFF8B2323),

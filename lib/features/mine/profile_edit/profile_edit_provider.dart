@@ -31,19 +31,15 @@ class ProfileEditProvider extends BaseProvider {
     }
   }
 
-  Future<bool> saveProfile(
-    BuildContext context, {
-    required String nickName,
-    required String dailyQuote,
-  }) async {
-    if (nickName.isEmpty) {
+  Future<bool> saveProfile(BuildContext context, {required String nickname, required String dailyQuote}) async {
+    if (nickname.isEmpty) {
       setError("昵称不能为空");
       return false;
     }
 
     setLoading(true);
     final result = await _repo.updateUserInfo(
-      nickName: nickName,
+      nickname: nickname,
       dailyQuote: dailyQuote,
       avatarUrl: _localAvatarPath, // 提交本地真实路径给接口
     );

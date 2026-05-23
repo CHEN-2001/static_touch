@@ -1,28 +1,48 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-// token管理
+// Token管理
 class TokenManager {
-  static const String _tokenKey = 'static_touch_token';
+  static const String _accessTokenKey = 'static_touch_accessToken';
+  static const String _refreshTokenKey = 'static_touch_refreshToken';
+
   static const _storage = FlutterSecureStorage();
 
-  // 存
-  static Future<void> setToken(String token) async {
-    await _storage.write(key: _tokenKey, value: token);
+  static String? _cachedAccessToken;
+  static String? _cachedRefreshToken;
+
+  // 存双Token
+  static Future<void> setAllToken(String accessToken, String refreshToken) async {
+    _cachedAccessToken = accessToken;
+    _cachedRefreshToken = refreshToken;
+
+    await Future.wait([
+      _storage.write(key: _accessTokenKey, value: accessToken),
+      _storage.write(key: _refreshTokenKey, value: refreshToken),
+    ]);
   }
 
-  // 取
-  static Future<String?> getToken() async {
-    return await _storage.read(key: _tokenKey);
+  // 取AccessToken
+  static Future<String?> getAccessToken() async {
+    _cachedAccessToken ??= await _storage.read(key: _accessTokenKey);
+    return _cachedAccessToken;
   }
 
-  // 删
+  // 取RefreshToken
+  static Future<String?> getRefreshToken() async {
+    _cachedRefreshToken ??= await _storage.read(key: _refreshTokenKey);
+    return _cachedRefreshToken;
+  }
+
+  // 删双token
   static Future<void> clearToken() async {
-    await _storage.delete(key: _tokenKey);
+    _cachedAccessToken = null;
+    _cachedRefreshToken = null;
+    await Future.wait([_storage.delete(key: _accessTokenKey), _storage.delete(key: _refreshTokenKey)]);
   }
 
   // 验证是否已登录
   static Future<bool> isLoggedIn() async {
-    final token = await getToken();
+    final token = await getAccessToken();
     return token != null && token.isNotEmpty;
   }
 }

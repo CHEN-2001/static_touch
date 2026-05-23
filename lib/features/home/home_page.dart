@@ -21,7 +21,6 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin 
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      // 🚀 首次进入加载
       context.read<UserStateProvider>().initData(isSilent: false);
       context.read<LiveStateProvider>().initAndRefresh();
     });
@@ -33,16 +32,13 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin 
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
-      // 🚀 核心重构：从 ScrollView 换成 Column，让上半部分彻底固定！
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: const [
-          SizedBox(height: 20),
           HomeHeader(),
           SizedBox(height: 30),
           DurationCard(),
           SizedBox(height: 30),
-          // 🚀 核心重构：将屏幕剩余的所有空间，交给下方的时刻表列表！
           Expanded(child: ScheduleList()),
         ],
       ),

@@ -1,16 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-
-// 导入页面和 Provider
+// 载入
 import 'package:static_touch/features/splash/splash_page.dart';
-import 'package:static_touch/features/auth/login_page.dart';
-import 'package:static_touch/features/auth/login_provider.dart';
+// 首页基座
 import 'package:static_touch/features/main_tab/main_page.dart';
+
+// 认证模块 (auth)
+import 'package:static_touch/features/auth/login/login_page.dart';
+import 'package:static_touch/features/auth/login/login_provider.dart';
+import 'package:static_touch/features/auth/register/register_page.dart';
+import 'package:static_touch/features/auth/register/register_provider.dart';
+import 'package:static_touch/features/auth/reset_password/reset_password_page.dart';
+import 'package:static_touch/features/auth/reset_password/reset_password_provider.dart';
+
 import 'package:static_touch/features/settings/settings_provider.dart';
 import 'package:static_touch/features/notice/notice_page.dart';
 import 'package:static_touch/features/notice/notice_provider.dart';
-import 'package:static_touch/features/stats/stats_provider.dart';
 import 'package:static_touch/features/notice/notice_detail_page.dart';
 import 'package:static_touch/features/nfc/nfc_page.dart';
 import 'package:static_touch/features/nfc/nfc_provider.dart';
@@ -34,11 +40,15 @@ import 'package:static_touch/features/mine/profile_edit/profile_edit_page.dart';
 import 'package:static_touch/features/mine/profile_edit/profile_edit_provider.dart';
 import 'package:static_touch/features/mine/vip/vip_page.dart';
 import 'package:static_touch/features/mine/vip/vip_provider.dart';
+import 'package:static_touch/shared/providers/user_state_provider.dart';
 
 // 定义路由路径常量
 class AppRoutes {
   static const splash = '/splash';
+  // 认证相关(auth)
   static const login = '/login';
+  static const register = '/register';
+  static const resetPassword = '/resetPassword';
   static const main = '/main';
   static const notice = '/notice';
   static const noticeDetail = '/noticeDetail';
@@ -78,15 +88,6 @@ class AppRouter {
         path: AppRoutes.splash,
         pageBuilder: (context, state) => fadePage(key: state.pageKey, child: const SplashPage()),
       ),
-      // 登录页：局部注入，登录完销毁，不占内存
-      GoRoute(
-        path: AppRoutes.login,
-        pageBuilder: (context, state) => fadePage(
-          key: state.pageKey,
-          child: ChangeNotifierProvider(create: (_) => LoginProvider(), child: const LoginPage()),
-        ),
-      ),
-      // 首页基座
       // 首页基座
       GoRoute(
         path: AppRoutes.main,
@@ -101,6 +102,31 @@ class AppRouter {
             ],
             child: const MainPage(),
           ),
+        ),
+      ),
+      /*          认证模块(认证)           */
+      // 登录
+      GoRoute(
+        path: AppRoutes.login,
+        pageBuilder: (context, state) => fadePage(
+          key: state.pageKey,
+          child: ChangeNotifierProvider(create: (_) => LoginProvider(), child: const LoginPage()),
+        ),
+      ),
+      // 注册
+      GoRoute(
+        path: AppRoutes.register,
+        pageBuilder: (context, state) => fadePage(
+          key: state.pageKey,
+          child: ChangeNotifierProvider(create: (_) => RegisterProvider(), child: const RegisterPage()),
+        ),
+      ),
+      // 忘记密码
+      GoRoute(
+        path: AppRoutes.resetPassword,
+        pageBuilder: (context, state) => fadePage(
+          key: state.pageKey,
+          child: ChangeNotifierProvider(create: (_) => ResetPasswordProvider(), child: const ResetPasswordPage()),
         ),
       ),
       // 通知/公告 (局部注入)
@@ -157,7 +183,7 @@ class AppRouter {
         path: AppRoutes.stats,
         pageBuilder: (context, state) => fadePage(
           key: state.pageKey,
-          child: ChangeNotifierProvider(create: (_) => StatsProvider(), child: const StatsPage()),
+          child: ChangeNotifierProvider(create: (_) => UserStateProvider(), child: const StatsPage()),
         ),
       ),
       // 课程详细

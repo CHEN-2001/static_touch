@@ -19,10 +19,6 @@ class ScheduleList extends StatelessWidget {
     ]);
   }
 
-  // ==========================================
-  // 🚀 核心优化：瀑布式智能跳转逻辑
-  // 完美契合你未来“按时间排序”的数据结构
-  // ==========================================
   void _handleQuickEnter(BuildContext context, List<LiveItemModel> items) {
     if (items.isEmpty) {
       context.showAppToast(message: "今日暂无直播安排", type: AppToastType.warning);
@@ -74,12 +70,11 @@ class ScheduleList extends StatelessWidget {
               '今日静心时刻表',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF4A2B2B)),
             ),
-            // 🚀 将写死的跳转换成智能跳转，并修改了文案
             GestureDetector(
               onTap: () => _handleQuickEnter(context, items),
               behavior: HitTestBehavior.opaque,
               child: const Text(
-                '快捷进入', // 文案改为快捷进入更贴切
+                '快捷进入',
                 style: TextStyle(color: Color(0xFF8B2323), fontSize: 14, fontWeight: FontWeight.bold),
               ),
             ),

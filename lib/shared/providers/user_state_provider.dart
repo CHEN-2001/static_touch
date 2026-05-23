@@ -1,5 +1,7 @@
+import 'package:static_touch/core/result/result_model.dart';
 import 'package:static_touch/shared/providers/base_provider.dart';
 import 'package:static_touch/shared/models/user/user_model.dart';
+import 'package:static_touch/shared/models/stats/meditation_stats_model.dart';
 import 'package:static_touch/core/utils/time_greeting_utils.dart';
 import 'package:static_touch/locator.dart';
 import 'package:static_touch/shared/repositories/user_repository.dart';
@@ -9,33 +11,39 @@ class UserStateProvider extends BaseProvider {
 
   UserModel _user = UserModel.empty();
   String _dailyQuote = "";
-  int _totalDuration = 0;
+
+  MeditationStatsModel _stats = MeditationStatsModel.empty();
 
   UserModel get user => _user;
   String get dailyQuote => _dailyQuote;
-  int get totalDuration => _totalDuration;
+
+  MeditationStatsModel? get stats => _stats;
+
+  int get totalDuration => _stats.totalMinutes;
 
   String get greeting => TimeGreetingUtils.getGreeting();
 
-  // 🚀 核心优化：增加 isSilent 参数。如果是静默刷新，就不触发骨架屏
   Future<void> initData({bool isSilent = false}) async {
-    if (!isSilent) setLoading(true); // 只有非静默状态（首次进入）才触发加载动画/骨架屏
+    if (!isSilent) setLoading(true);
     clearError();
-
     try {
-      final result = await _userRepo.fetchUserInfo();
-
-      if (result.status && result.data != null) {
-        _user = result.data!;
+      final results = await Future.wait([_userRepo.fetchUserInfo(), _userRepo.fetchUserStats()]);
+      final userResult = results[0] as ResultEntity<UserModel>;
+      final statsResult = results[1] as ResultEntity<MeditationStatsModel>;
+      if (userResult.status && userResult.data != null) {
+        _user = userResult.data!;
         _dailyQuote = _user.dailyQuote;
-        _totalDuration = _user.totalDuration;
-        // 🚀 拿到新数据后，通知 UI 局部更新（静默替换旧数据）
-        notifyListeners();
       } else {
-        if (!isSilent) setError(result.message);
+        if (!isSilent) setError(userResult.message);
       }
+      if (statsResult.status && statsResult.data != null) {
+        _stats = statsResult.data!;
+      } else {
+        _stats = MeditationStatsModel();
+      }
+      notifyListeners();
     } catch (e) {
-      if (!isSilent) setError("获取用户信息失败");
+      if (!isSilent) setError("获取用户聚合数据失败");
     } finally {
       if (!isSilent) setLoading(false);
     }

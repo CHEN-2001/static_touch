@@ -1,52 +1,78 @@
 class UserModel {
   final int id;
-  final String nickName;
+  final String email;
+  final String nickname;
   final String avatarUrl;
   final String dailyQuote;
-  final int totalDuration;
-  final bool isAnchor;
+  final bool isVip;
+  final DateTime? vipExpireTime;
+  final int role;
+
   UserModel({
     this.id = 0,
-    this.nickName = '',
+    this.email = '',
+    this.nickname = '',
     this.avatarUrl = '',
     this.dailyQuote = '',
-    this.totalDuration = 0,
-    this.isAnchor = true,
+    this.isVip = false,
+    this.vipExpireTime,
+    this.role = 0,
   });
 
-  factory UserModel.empty() => UserModel(id: -1, nickName: '加载中...', avatarUrl: '', totalDuration: 0);
+  factory UserModel.empty() =>
+      UserModel(id: -1, email: '', nickname: '加载中...', avatarUrl: '', dailyQuote: '修行中...', isVip: false, role: 0);
 
-  // 从 JSON 解析时进行保底
   factory UserModel.fromJson(Map<String, dynamic> json) {
+    bool parseIsVip(dynamic value) {
+      if (value is bool) return value;
+      if (value is int) return value == 1;
+      if (value is String) return value == '1' || value.toLowerCase() == 'true';
+      return false;
+    }
+
+    DateTime? parseDate(dynamic value) {
+      if (value == null) return null;
+      if (value is int) return DateTime.fromMillisecondsSinceEpoch(value);
+      if (value is String) return DateTime.tryParse(value);
+      return null;
+    }
+
     return UserModel(
       id: int.tryParse(json['id']?.toString() ?? '0') ?? 0,
-      nickName: json['nickName']?.toString() ?? 'user',
+      email: json['email']?.toString() ?? '',
+      nickname: json['nickname']?.toString() ?? 'user',
       avatarUrl: json['avatarUrl']?.toString() ?? '',
       dailyQuote: json['dailyQuote']?.toString() ?? '',
-      // 强制转为 int，最稳妥的做法
-      totalDuration: int.tryParse(json['totalDuration']?.toString() ?? '0') ?? 0,
-      isAnchor: json['isAnchor'] ?? false,
+      isVip: parseIsVip(json['isVip']),
+      vipExpireTime: parseDate(json['vipExpireTime']),
+      role: int.tryParse(json['role']?.toString() ?? '0') ?? 0,
     );
   }
 
-  // ==========================================
-  // 🚀 核心优化：重写相等运算符和哈希值
-  // 作用：当后端返回同样的数据时，Provider 会认为状态未改变，从而阻止整个 UI 页面的无脑刷新！
-  // ==========================================
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
 
     return other is UserModel &&
         other.id == id &&
-        other.nickName == nickName &&
+        other.email == email &&
+        other.nickname == nickname &&
         other.avatarUrl == avatarUrl &&
         other.dailyQuote == dailyQuote &&
-        other.totalDuration == totalDuration;
+        other.isVip == isVip &&
+        other.vipExpireTime == vipExpireTime &&
+        other.role == role;
   }
 
   @override
   int get hashCode {
-    return id.hashCode ^ nickName.hashCode ^ avatarUrl.hashCode ^ dailyQuote.hashCode ^ totalDuration.hashCode;
+    return id.hashCode ^
+        email.hashCode ^
+        nickname.hashCode ^
+        avatarUrl.hashCode ^
+        dailyQuote.hashCode ^
+        isVip.hashCode ^
+        vipExpireTime.hashCode ^
+        role.hashCode;
   }
 }

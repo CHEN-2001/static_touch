@@ -11,11 +11,9 @@ class HomeHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // 监听整个 UserStateProvider，根据 isLoading 切换 UI
     return Consumer<UserStateProvider>(
       builder: (context, provider, child) {
         if (provider.isLoading) {
-          // 网络请求期间：展示极具高级感的骨架屏
           return const Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -26,8 +24,7 @@ class HomeHeader extends StatelessWidget {
           );
         }
 
-        // 数据返回后：展示真实信息
-        final displayName = provider.user.nickName.isEmpty ? '用户' : provider.user.nickName;
+        final displayName = provider.user.nickname.isEmpty ? '用户' : provider.user.nickname;
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

@@ -14,7 +14,6 @@ class MineProvider extends ChangeNotifier {
   final List<MineMenuItem> _allMenus = [
     MineMenuItem(title: '修行数据', icon: Icons.insert_chart_rounded, route: AppRoutes.stats),
     MineMenuItem(title: '我的收藏', icon: Icons.bookmark_rounded, route: AppRoutes.collections),
-    // 🚀 指向顶级的直播数据路由
     MineMenuItem(title: '直播数据', icon: Icons.analytics_rounded, route: AppRoutes.liveData, anchorOnly: true),
     MineMenuItem(title: 'NFC 实体卡', icon: Icons.nfc_rounded, route: AppRoutes.nfc),
     MineMenuItem(title: '联系客服', icon: Icons.headset_mic_rounded, route: ''),

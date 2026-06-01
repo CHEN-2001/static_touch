@@ -13,22 +13,24 @@ import 'package:static_touch/features/auth/register/register_page.dart';
 import 'package:static_touch/features/auth/register/register_provider.dart';
 import 'package:static_touch/features/auth/reset_password/reset_password_page.dart';
 import 'package:static_touch/features/auth/reset_password/reset_password_provider.dart';
+// home页面
+import 'package:static_touch/features/home/home_provider.dart';
 
 import 'package:static_touch/features/settings/settings_provider.dart';
 import 'package:static_touch/features/notice/notice_page.dart';
 import 'package:static_touch/features/notice/notice_provider.dart';
 import 'package:static_touch/features/notice/notice_detail_page.dart';
-import 'package:static_touch/features/nfc/nfc_page.dart';
-import 'package:static_touch/features/nfc/nfc_provider.dart';
+import 'package:static_touch/features/mine/nfc/nfc_page.dart';
+import 'package:static_touch/features/mine/nfc/nfc_provider.dart';
 import 'package:static_touch/features/live/live_anchor/live_prepare_page.dart';
 import 'package:static_touch/features/live/live_room/live_detail_page.dart';
 import 'package:static_touch/features/stats/stats_page.dart';
 import 'package:static_touch/features/meditation_detail/meditation_detail_page.dart';
 import 'package:static_touch/features/meditation_detail/meditation_detail_provider.dart';
-import 'package:static_touch/features/live_data/live_data_page.dart';
-import 'package:static_touch/features/live_data/live_data_provider.dart';
-import 'package:static_touch/features/collections/collections_page.dart';
-import 'package:static_touch/features/collections/collections_provider.dart';
+import 'package:static_touch/features/mine/live_data/live_data_page.dart';
+import 'package:static_touch/features/mine/live_data/live_data_provider.dart';
+import 'package:static_touch/features/mine/collections/collections_page.dart';
+import 'package:static_touch/features/mine/collections/collections_provider.dart';
 import 'package:static_touch/shared/models/live/live_item_model.dart';
 import 'package:static_touch/core/navigation/nav_service.dart';
 import 'package:static_touch/features/live/live_home/live_provider.dart';
@@ -68,8 +70,8 @@ class AppRouter {
     return CustomTransitionPage<T>(
       key: key,
       child: child,
-      transitionDuration: const Duration(milliseconds: 400),
-      reverseTransitionDuration: const Duration(milliseconds: 400),
+      transitionDuration: const Duration(milliseconds: 100),
+      reverseTransitionDuration: const Duration(milliseconds: 100),
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         return FadeTransition(
           opacity: CurveTween(curve: Curves.easeInOut).animate(animation),
@@ -99,6 +101,7 @@ class AppRouter {
               ChangeNotifierProvider(create: (_) => SettingsProvider()),
               ChangeNotifierProvider(create: (_) => LiveProvider()),
               ChangeNotifierProvider(create: (_) => MineProvider()),
+              ChangeNotifierProvider(create: (_) => HomeProvider()),
             ],
             child: const MainPage(),
           ),
@@ -171,12 +174,21 @@ class AppRouter {
         ),
       ),
       // 直播详细
+      // 直播详细
       GoRoute(
         path: AppRoutes.liveDetail,
-        pageBuilder: (context, state) => fadePage(
-          key: state.pageKey,
-          child: ChangeNotifierProvider(create: (_) => LiveDetailProvider(), child: const LiveDetailPage()),
-        ),
+        pageBuilder: (context, state) {
+          // 🚀 核心修复：将类型强转改为 String?，兜底值改为空字符串
+          final liveId = state.extra as String? ?? '';
+
+          return fadePage(
+            key: state.pageKey,
+            child: ChangeNotifierProvider(
+              create: (_) => LiveDetailProvider(),
+              child: LiveDetailPage(liveId: liveId), // 把 String 类型的 ID 传给页面
+            ),
+          );
+        },
       ),
       // 统计数据
       GoRoute(

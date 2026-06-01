@@ -15,7 +15,7 @@ class _StatsPageState extends State<StatsPage> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<UserStateProvider>().initData;
+      context.read<UserStateProvider>().initData();
     });
   }
 
@@ -74,9 +74,16 @@ class _StatsPageState extends State<StatsPage> {
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: darkTextColor),
                   ),
                   const SizedBox(height: 20),
-                  TrendChart(trendData: stats.weeklyTrend),
+                  if (stats.weeklyTrend.isEmpty)
+                    const Center(
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(vertical: 40),
+                        child: Text("暂无记录", style: TextStyle(color: Colors.grey, fontSize: 14)),
+                      ),
+                    )
+                  else
+                    TrendChart(trendData: stats.weeklyTrend),
                   const SizedBox(height: 40),
-
                   const Text(
                     '修行成就',
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: darkTextColor),

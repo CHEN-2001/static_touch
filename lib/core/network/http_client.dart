@@ -19,9 +19,6 @@ class HttpClient {
     );
 
     dio.interceptors.add(AuthInterceptor(dio));
-
-    // 如果有需要，可以继续挂载Dio自带的Log拦截器进行调试
-    // dio.interceptors.add(LogInterceptor(requestBody: true, responseBody: true));
   }
 
   // 统一封装 GET 请求
@@ -68,10 +65,11 @@ class HttpClient {
     final resData = response.data;
 
     if (resData is Map<String, dynamic>) {
-      if (resData['code'] == 200) {
-        return ResultEntity(status: true, message: resData['msg'] ?? '成功', data: resData['data']);
+      final int? code = resData['code'];
+      if (code == 200) {
+        return ResultEntity(status: true, message: resData['msg'] ?? '成功', data: resData['data'], code: code);
       }
-      return ResultEntity.error(resData['msg'] ?? '请求失败');
+      return ResultEntity.error(resData['msg'] ?? '请求失败', code: code);
     }
     return ResultEntity.error('无法解析的服务器数据格式');
   }

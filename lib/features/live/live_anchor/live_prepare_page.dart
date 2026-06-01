@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:apivideo_live_stream/apivideo_live_stream.dart';
+import 'package:static_touch/shared/widgets/app_dialogs.dart'; // 🚀 引入 Toast 扩展
 import 'widgets/live_prepare_toolbar.dart';
 import 'live_prepare_provider.dart';
 
@@ -16,8 +18,67 @@ class _LivePreparePageState extends State<LivePreparePage> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      try {
+        final extra = GoRouterState.of(context).extra as Map<String, dynamic>?;
+        if (extra != null && extra['scheduledLiveId'] != null) {
+          context.read<LivePrepareProvider>().setScheduledLiveId(extra['scheduledLiveId'].toString());
+        }
+      } catch (e) {
+        debugPrint("无附加参数，直接创建新直播");
+      }
+
       context.read<LivePrepareProvider>().initCamera();
     });
+  }
+
+  void _handleStartButtonPressed(LivePrepareProvider p) async {
+    if (p.isStreaming) {
+      p.startBroadcast(context);
+      return;
+    }
+    if (p.scheduledLiveId == null) {
+      final titleController = TextEditingController(text: p.title);
+
+      final bool? confirm = await showDialog<bool>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          title: const Text('开播设置', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          content: TextField(
+            controller: titleController,
+            decoration: InputDecoration(
+              hintText: '给直播起个吸引人的标题吧',
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: const Text('取消', style: TextStyle(color: Colors.grey)),
+            ),
+            TextButton(
+              onPressed: () {
+                if (titleController.text.trim().isEmpty) {
+                  context.showAppToast(message: '标题不能为空', type: AppToastType.warning);
+                  return;
+                }
+                Navigator.pop(ctx, true);
+              },
+              child: const Text(
+                '确认开播',
+                style: TextStyle(color: Color(0xFF8B2323), fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
+        ),
+      );
+
+      if (confirm != true) return;
+
+      p.updateTitle(titleController.text.trim());
+    }
+    if (!mounted) return;
+    p.startBroadcast(context);
   }
 
   @override
@@ -29,7 +90,6 @@ class _LivePreparePageState extends State<LivePreparePage> {
           return Stack(
             fit: StackFit.expand,
             children: [
-              // 渲染层：底层引擎画面输出
               if (p.controller != null)
                 Center(
                   child: Transform(
@@ -41,7 +101,6 @@ class _LivePreparePageState extends State<LivePreparePage> {
               else
                 const Center(child: CircularProgressIndicator(color: Colors.white24)),
 
-              // 交互层：控制遮罩与操作流
               SafeArea(
                 child: Column(
                   children: [
@@ -49,7 +108,7 @@ class _LivePreparePageState extends State<LivePreparePage> {
                       alignment: Alignment.topLeft,
                       child: IconButton(
                         icon: const Icon(Icons.close, color: Colors.white, size: 30),
-                        onPressed: () => Navigator.pop(context),
+                        onPressed: () => context.pop(),
                       ),
                     ),
                     const Align(alignment: Alignment.topRight, child: LivePrepareToolbar()),
@@ -58,9 +117,9 @@ class _LivePreparePageState extends State<LivePreparePage> {
                     Padding(
                       padding: const EdgeInsets.only(bottom: 50),
                       child: ElevatedButton(
-                        onPressed: p.isLoading ? null : () => p.startBroadcast(context),
+                        onPressed: p.isLoading ? null : () => _handleStartButtonPressed(p),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: p.isStreaming ? Colors.grey : const Color(0xFFFF4D6A),
+                          backgroundColor: p.isStreaming ? Colors.grey : const Color(0xFF8B2323),
                           padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                           elevation: 8,

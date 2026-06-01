@@ -1,44 +1,36 @@
-import 'package:static_touch/locator.dart';
 import 'package:static_touch/shared/providers/base_provider.dart';
-import 'package:static_touch/shared/models/live/live_item_model.dart';
 import 'package:static_touch/shared/repositories/live_repository.dart';
+import 'package:static_touch/locator.dart';
+import 'package:static_touch/shared/models/live/live_item_model.dart';
 
-class LiveProvider extends BaseProvider {
+class HomeProvider extends BaseProvider {
   final LiveRepository _liveRepo = locator<LiveRepository>();
-  // 列表数据源
+
+  // 首页时刻表数据源
   List<LiveItemModel> _scheduleItems = [];
   List<LiveItemModel> get scheduleItems => _scheduleItems;
 
-  // 选中的下标
-  int _currentTabIndex = 0;
-  int get currentTabIndex => _currentTabIndex;
-
-  // tags列表
-  final List<String> tabs = ['全部', '直播中', '即将开始', '已结束'];
-
-  // 选中下标的方法
-  void setTabIndex(int index) {
-    if (_currentTabIndex != index) {
-      _currentTabIndex = index;
-      notifyListeners();
-    }
-  }
-
-  // 获取直播列表
+  /// 获取首页今日时刻表
   Future<void> fetchTodaySchedule({bool isSilent = false}) async {
     if (!isSilent) setLoading(true);
     clearError();
+
     try {
-      final result = await _liveRepo.fetchLivePage();
+      final result = await _liveRepo.fetchTodayLiveList();
       if (result.status && result.data != null) {
-        final List listData = result.data['records'] ?? [];
+        List listData = [];
+        if (result.data is List) {
+          listData = result.data as List;
+        } else if (result.data is Map) {
+          listData = result.data['list'] ?? [];
+        }
         _scheduleItems = listData.map((e) => LiveItemModel.fromJson(e)).toList();
         notifyListeners();
       } else {
         if (!isSilent) setError(result.message);
       }
     } catch (e) {
-      if (!isSilent) setError("获取直播列表失败，请检查网络");
+      if (!isSilent) setError("获取首页时刻表失败，请检查网络");
     } finally {
       if (!isSilent) setLoading(false);
     }

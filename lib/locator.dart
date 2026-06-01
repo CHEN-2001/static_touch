@@ -1,5 +1,6 @@
 import 'package:get_it/get_it.dart';
 import 'package:static_touch/core/network/http_client.dart';
+import 'package:static_touch/shared/repositories/system_repository.dart';
 import 'package:static_touch/shared/repositories/user_repository.dart';
 import 'package:static_touch/shared/repositories/live_repository.dart';
 import 'package:static_touch/shared/repositories/collection_repository.dart';
@@ -12,8 +13,9 @@ final locator = GetIt.instance;
 void setupLocator() {
   // 注册核心网络
   locator.registerLazySingleton<HttpClient>(() => HttpClient());
-
-  // 注册公共用户仓库
+  // 注册系统仓库
+  locator.registerCachedFactory<SystemRepository>(() => SystemRepository(locator()));
+  // 注册用户仓库
   locator.registerLazySingleton<UserRepository>(() => UserRepository(locator()));
   locator.registerLazySingleton<LiveRepository>(() => LiveRepository(locator()));
   // 注册auth仓库

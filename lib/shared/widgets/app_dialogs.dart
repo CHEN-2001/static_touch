@@ -66,7 +66,7 @@ extension AppDialogExtension on BuildContext {
         iconColor = const Color(0xFFDA8B33);
         bgColor = const Color(0xFFFFF8EE);
         break;
-      // 🚀 2. 补齐 info 的视觉配置（静谧蓝灰色）
+      // 补齐 info 的视觉配置（静谧蓝灰色）
       case AppToastType.info:
         iconData = Icons.info_outline;
         iconColor = const Color(0xFF5B7A8C);
@@ -76,8 +76,7 @@ extension AppDialogExtension on BuildContext {
 
     Alignment alignment;
     EdgeInsets margin;
-    final bottomPadding = MediaQuery.of(this).viewInsets.bottom;
-
+    final bottomPadding = MediaQuery.maybeOf(this)?.viewInsets.bottom ?? 0.0;
     switch (position) {
       case AppToastPosition.top:
         alignment = Alignment.topCenter;
@@ -115,7 +114,7 @@ extension AppDialogExtension on BuildContext {
                   decoration: BoxDecoration(
                     color: bgColor,
                     borderRadius: BorderRadius.circular(10),
-                    // 🚀 3. 规范替换为 withValues(alpha: x)
+                    // 规范替换为 withValues(alpha: x)
                     border: Border.all(color: iconColor.withValues(alpha: 0.2)),
                     boxShadow: [
                       BoxShadow(

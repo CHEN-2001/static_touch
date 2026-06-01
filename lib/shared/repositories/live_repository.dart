@@ -1,138 +1,70 @@
-import 'dart:async';
-import 'package:static_touch/shared/models/live/live_item_model.dart';
-import 'package:static_touch/shared/enum/live_status_enum.dart';
 import 'package:static_touch/core/network/http_client.dart';
 import 'package:static_touch/core/result/result_model.dart';
-import 'package:static_touch/shared/models/live/live_data_model.dart';
+import 'package:static_touch/core/network/api_endpoints.dart';
 
 class LiveRepository {
   final HttpClient _client;
   LiveRepository(this._client);
 
-  static const bool isMock = true;
+  // 观众获取直播详情 / 进入房间
+  Future<ResultEntity> fetchLiveDetail(String liveId) async {
+    return await _client.get('${ApiEndpoints.liveDetail}/$liveId');
+  }
+  // ================= 主播端接口 =================
 
-  // 获取直播列表
-  Future<List<LiveItemModel>> fetchLiveListFromApi() async {
-    if (!isMock) {
-      final result = await _client.get('/live/list');
-      if (result.status && result.data is List) {
-        return (result.data as List).map((e) => LiveItemModel.fromJson(e)).toList();
-      }
-      return [];
-    }
-    await Future.delayed(const Duration(seconds: 1));
-    return [
-      LiveItemModel(
-        id: '1',
-        title: '深度睡眠环境音',
-        status: LiveStatus.ended,
-        coverUrl: '',
-        anchorName: '导师A',
-        anchorAvatar: '',
-        viewerCount: 120,
-        timeDisplay: '昨日 20:00',
-      ),
-      LiveItemModel(
-        id: '2',
-        title: '晨间正念冥想直播',
-        status: LiveStatus.live,
-        coverUrl: '',
-        anchorName: '不二法门',
-        anchorAvatar: '',
-        viewerCount: 356,
-        timeDisplay: '09:00 - 10:00',
-      ),
-      LiveItemModel(
-        id: '3',
-        title: '晚间助眠修行预告',
-        status: LiveStatus.preparing,
-        coverUrl: '',
-        anchorName: '导师B',
-        anchorAvatar: '',
-        viewerCount: 0,
-        timeDisplay: '22:00 - 23:00',
-      ),
-    ];
+  // 预发布直播间
+  Future<ResultEntity> scheduleLive({
+    required String title,
+    String coverUrl = '',
+    String? expectedStartTime, // 如果需要传时间，需符合后端 LocalDateTime 约定的格式 (如 ISO-8601)
+  }) async {
+    final data = {
+      'title': title,
+      'coverUrl': coverUrl,
+      if (expectedStartTime != null) 'expectedStartTime': expectedStartTime,
+    };
+    return await _client.post(ApiEndpoints.liveSchedule, data: data);
   }
 
-  // 监听直播状态
-  Stream<LiveItemModel> listenLiveUpdates() async* {}
-
-  // 主播创建直播间
-  // Future<ResultEntity<String>> createLiveRoom(String title) async {
-  //   await Future.delayed(const Duration(seconds: 1));
-  //   return ResultEntity(status: true, message: '创建成功', data: 'rtmp://test');
-  // }
-
-  // // 观众进入直播间
-  // Future<ResultEntity<String>> enterLiveRoom(String roomId) async {
-  //   await Future.delayed(const Duration(seconds: 1));
-  //   return ResultEntity(status: true, message: '进入成功', data: 'http://test.flv');
-  // }
-  // 主播创建直播间 (推流端)
-  Future<ResultEntity<String>> createLiveRoom(String title) async {
-    await Future.delayed(const Duration(seconds: 1));
-
-    // 🚀 写死你的真实服务器 IP 和推流码 123456
-    String myPushUrl = 'rtmp://47.92.105.53/:1935/live/123456';
-
-    return ResultEntity(status: true, message: '创建成功', data: myPushUrl);
+  // 正式开播 (支持直接开播，也支持带着 scheduledLiveId 启动预发布)
+  Future<ResultEntity> startLive({String? title, String? coverUrl, String? scheduledLiveId}) async {
+    final data = {
+      if (title != null && title.isNotEmpty) 'title': title,
+      if (coverUrl != null && coverUrl.isNotEmpty) 'coverUrl': coverUrl,
+      if (scheduledLiveId != null && scheduledLiveId.isNotEmpty) 'scheduledLiveId': scheduledLiveId,
+    };
+    return await _client.post(ApiEndpoints.liveStart, data: data);
   }
 
-  // 观众进入直播间 (拉流端)
-  Future<ResultEntity<String>> enterLiveRoom(String roomId) async {
-    await Future.delayed(const Duration(seconds: 1));
-
-    // 🚀 写死你的真实服务器 IP 和播放码 123456
-    String myPullUrl = 'http://47.92.105.53:8080/live/123456.flv';
-
-    return ResultEntity(status: true, message: '进入成功', data: myPullUrl);
+  // 取消预发布的房间
+  Future<ResultEntity> cancelSchedule(String liveId) async {
+    return await _client.post('${ApiEndpoints.liveBase}/$liveId/cancel');
   }
 
-  // 🚀 主播获取直播数据统计 (更新了数据结构以支持图表和弹窗)
-  Future<ResultEntity<LiveDataModel>> fetchLiveStats() async {
-    if (!isMock) {
-      // return await _client.get('/live/stats');
-    }
-    await Future.delayed(const Duration(milliseconds: 600));
-    return ResultEntity(
-      status: true,
-      message: '获取成功',
-      data: LiveDataModel(
-        totalHours: "1,220",
-        totalCount: 365,
-        trendRate: "本周 +15%",
-        trendData: [
-          TrendPoint("02-26", 20),
-          TrendPoint("", 40),
-          TrendPoint("03-01", 60),
-          TrendPoint("", 45),
-          TrendPoint("", 50),
-          TrendPoint("今日", 30),
-        ],
-        history: [
-          LiveHistoryRecord(
-            id: "101",
-            title: "直播标题二",
-            timeLabel: "昨天 8:00",
-            fullDate: "2026-03-04",
-            durationMinutes: 32,
-            viewers: 800,
-            comments: 120,
-            checkIns: 90,
-          ),
-          LiveHistoryRecord(
-            id: "102",
-            title: "直播标题一",
-            timeLabel: "3月2日",
-            fullDate: "2026-03-02",
-            durationMinutes: 60,
-            viewers: 1000,
-            comments: 156,
-            checkIns: 100,
-          ),
-        ],
-      ),
-    );
+  // 结束直播
+  Future<ResultEntity> endLive(String liveId) async {
+    return await _client.post('${ApiEndpoints.liveBase}/$liveId/end');
+  }
+
+  // 心跳保活 (App端定时器每隔几秒静默调用)
+  Future<ResultEntity> heartbeat(String liveId) async {
+    return await _client.post('${ApiEndpoints.liveBase}/$liveId/heartbeat');
+  }
+
+  // ================= 观众端接口 =================
+
+  // 获取今日直播列表
+  Future<ResultEntity> fetchTodayLiveList() async {
+    return await _client.get(ApiEndpoints.liveToday);
+  }
+
+  // 获取分页大厅列表
+  Future<ResultEntity> fetchLivePage({int pageNum = 1, int pageSize = 10}) async {
+    return await _client.get(ApiEndpoints.livePage, queryParameters: {'pageNum': pageNum, 'pageSize': pageSize});
+  }
+
+  // 点击进入直播间 (实时获取拉流地址)
+  Future<ResultEntity> enterLiveRoom(String liveId) async {
+    return await _client.get('${ApiEndpoints.liveBase}/$liveId/enter');
   }
 }

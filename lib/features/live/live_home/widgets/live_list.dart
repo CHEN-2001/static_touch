@@ -4,26 +4,20 @@ import 'package:provider/provider.dart';
 import 'package:static_touch/routes/app_router.dart';
 import 'package:static_touch/shared/enum/live_status_enum.dart';
 import 'package:static_touch/shared/models/live/live_item_model.dart';
-import 'package:static_touch/shared/providers/live_state_provider.dart';
-import 'package:static_touch/shared/widgets/app_dialogs.dart'; // 🚀 引入弹窗用于未开始提示
+import 'package:static_touch/shared/widgets/app_dialogs.dart';
 import '../live_provider.dart';
 
 class LiveList extends StatelessWidget {
-  const LiveList({super.key}); // 🚀 恢复无参构造，完美兼容你的 live_page.dart
+  const LiveList({super.key});
 
-  // 触发全局直播数据的静默刷新
   Future<void> _onRefresh(BuildContext context) async {
-    await context.read<LiveStateProvider>().refreshLiveList();
+    await context.read<LiveProvider>().fetchTodaySchedule(isSilent: true);
   }
 
   @override
   Widget build(BuildContext context) {
-    // 1. 拿到全局数据池
-    final allItems = context.select((LiveStateProvider p) => p.items);
-    // 2. 拿到当前选中的 Tab
+    final allItems = context.select((LiveProvider p) => p.scheduleItems);
     final tabIndex = context.select((LiveProvider p) => p.currentTabIndex);
-
-    // 3. 本地纯函数过滤，绝不产生二次网络请求
     List<LiveItemModel> items;
     switch (tabIndex) {
       case 1:
@@ -76,21 +70,17 @@ class LiveList extends StatelessWidget {
 class _LiveCardItem extends StatelessWidget {
   final LiveItemModel item;
   const _LiveCardItem({required this.item});
-
   @override
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.only(bottom: 20),
       child: InkWell(
         onTap: () {
-          // 🚀 核心修复：严格遵循 PRD 文档的路由分发逻辑
           if (item.status == LiveStatus.live) {
             context.push(AppRoutes.liveDetail);
           } else if (item.status == LiveStatus.preparing) {
-            // 🚀 未开始：只弹提示，不乱跳转
             context.showAppToast(message: "直播尚未开始，已为您设置开播提醒", type: AppToastType.info);
           } else {
-            // 🚀 回放：带上参数跳详情
             context.push(AppRoutes.meditationDetail, extra: item);
           }
         },
@@ -100,7 +90,6 @@ class _LiveCardItem extends StatelessWidget {
           decoration: BoxDecoration(
             color: Colors.black,
             borderRadius: BorderRadius.circular(16),
-            // 🚀 拥抱 withValues 新语法
             boxShadow: [
               BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 10, offset: const Offset(0, 5)),
             ],

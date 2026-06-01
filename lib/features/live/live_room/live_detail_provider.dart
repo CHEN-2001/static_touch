@@ -1,6 +1,8 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
-import 'package:media_kit/media_kit.dart'; // 🚀 引入播放器
-import 'package:media_kit_video/media_kit_video.dart'; // 🚀 引入视频控制器
+import 'package:media_kit/media_kit.dart'; // 引入播放器
+import 'package:media_kit_video/media_kit_video.dart'; // 引入视频控制器
 import 'package:static_touch/locator.dart';
 import 'package:static_touch/shared/repositories/live_repository.dart';
 import 'package:static_touch/shared/providers/base_provider.dart';
@@ -10,7 +12,6 @@ class LiveDetailProvider extends BaseProvider {
   String? _pullUrl;
   String? get pullUrl => _pullUrl;
 
-  // 🚀 1. 声明播放器和控制器
   late final Player player = Player();
   late final VideoController videoController = VideoController(player);
 
@@ -42,14 +43,18 @@ class LiveDetailProvider extends BaseProvider {
     setLoading(true);
     clearError();
     final repo = locator<LiveRepository>();
-    final result = await repo.enterLiveRoom(roomId);
+    final result = await repo.fetchLiveDetail(roomId);
     setLoading(false);
 
     if (result.status && result.data != null) {
-      _pullUrl = result.data;
+      if (result.data is Map) {
+        _pullUrl = result.data['streamUrl'];
+      } else {
+        _pullUrl = result.data.toString();
+      }
+
       debugPrint("🚀 [播放器] 准备拉取的地址是: $_pullUrl");
 
-      // 🚀 重点：监听底层的各种状态，打印到控制台
       player.stream.error.listen((error) {
         debugPrint('❌ [播放器报错] 发生严重错误: $error');
       });
@@ -62,8 +67,9 @@ class LiveDetailProvider extends BaseProvider {
         debugPrint('✅ [播放器画面] 成功解析到视频！宽度: $width');
       });
 
-      // 开启播放
-      await player.open(Media(_pullUrl!), play: true);
+      if (_pullUrl != null && _pullUrl!.isNotEmpty) {
+        await player.open(Media(_pullUrl!), play: true);
+      }
     } else {
       setError(result.message);
     }
@@ -71,14 +77,13 @@ class LiveDetailProvider extends BaseProvider {
 
   void togglePlay() {
     _isPlaying = !_isPlaying;
-    // 🚀 控制底层播放器暂停/继续
+    // 控制底层播放器暂停/继续
     player.playOrPause();
     notifyListeners();
   }
 
   void toggleMute() {
     _isMuted = !_isMuted;
-    // 🚀 控制底层播放器音量 (0静音，100最大)
     player.setVolume(_isMuted ? 0.0 : 100.0);
     notifyListeners();
   }
@@ -89,7 +94,6 @@ class LiveDetailProvider extends BaseProvider {
     context.showAppToast(message: _isAudioOnly ? "已關閉視頻，進入純音頻模式" : "已恢復視頻畫面", type: AppToastType.info);
   }
 
-  // ... (保留你原来的 sendDanmu, doCheckIn 等方法) ...
   void sendDanmu(String text) {
     if (text.trim().isNotEmpty) {
       _danmuList.add(text);
@@ -123,7 +127,6 @@ class LiveDetailProvider extends BaseProvider {
     notifyListeners();
   }
 
-  // 🚀 3. 页面销毁时，释放播放器内存
   @override
   void dispose() {
     player.dispose();

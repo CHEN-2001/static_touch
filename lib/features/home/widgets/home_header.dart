@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:static_touch/shared/providers/system_state_provider.dart';
 import 'package:static_touch/shared/providers/user_state_provider.dart';
 import 'package:static_touch/shared/widgets/skeleton_block.dart';
 
@@ -11,8 +12,8 @@ class HomeHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<UserStateProvider>(
-      builder: (context, provider, child) {
+    return Consumer2<UserStateProvider, SystemStateProvider>(
+      builder: (context, provider, systemProvider, child) {
         if (provider.isLoading) {
           return const Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -30,7 +31,7 @@ class HomeHeader extends StatelessWidget {
           children: [
             Text('${provider.greeting}，$displayName', style: _titleStyle),
             const SizedBox(height: 4),
-            if (provider.dailyQuote.isNotEmpty) Text(provider.dailyQuote, style: _quoteStyle),
+            if (systemProvider.dailyQuote.isNotEmpty) Text(systemProvider.dailyQuote, style: _quoteStyle),
           ],
         );
       },

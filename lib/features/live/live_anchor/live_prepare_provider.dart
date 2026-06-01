@@ -1,68 +1,74 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+// 🚀 确保引入你的 SDK
 import 'package:apivideo_live_stream/apivideo_live_stream.dart';
 import 'package:static_touch/locator.dart';
-import 'package:static_touch/shared/repositories/live_repository.dart';
-import 'package:static_touch/shared/widgets/app_dialogs.dart';
 import 'package:static_touch/shared/providers/base_provider.dart';
+import 'package:static_touch/shared/repositories/live_repository.dart';
+import 'package:static_touch/shared/providers/live_state_provider.dart';
 
 class LivePrepareProvider extends BaseProvider {
+  final LiveRepository _liveRepo = locator<LiveRepository>();
+
+  // ================= 摄像头与推流状态 =================
   ApiVideoLiveStreamController? _controller;
   ApiVideoLiveStreamController? get controller => _controller;
 
-  bool _isMicOn = true;
   bool _isMirror = false;
-  bool _isStreaming = false; // 实时推流状态机
-
-  bool get isMicOn => _isMicOn;
   bool get isMirror => _isMirror;
+
+  bool _isMicOn = true;
+  bool get isMicOn => _isMicOn;
+
+  bool _isStreaming = false;
   bool get isStreaming => _isStreaming;
 
-  // 模块化初始化推流引擎
+  // ================= 后端业务表单状态 =================
+  String title = '静心修行直播'; // 默认标题
+  String coverUrl = '';
+  String notice = '';
+
+  String? _liveId;
+  String? get liveId => _liveId;
+
+  // 🚀 接收从大厅传进来的预告ID
+  String? _scheduledLiveId;
+
+  String? get scheduledLiveId => _scheduledLiveId;
+
+  void setScheduledLiveId(String? id) {
+    _scheduledLiveId = id;
+    notifyListeners();
+  }
+
+  // ================= 摄像头控制方法 =================
+
   Future<void> initCamera() async {
     try {
-      final videoConfig = VideoConfig.withDefaultBitrate(resolution: Resolution.RESOLUTION_720);
-      final audioConfig = AudioConfig(bitrate: 128 * 1000);
-
       _controller = ApiVideoLiveStreamController(
-        initialAudioConfig: audioConfig,
-        initialVideoConfig: videoConfig,
-        onConnectionSuccess: () {
-          debugPrint('✅ [Engine] RTMP 握手成功，推流中');
-          _isStreaming = true;
-          notifyListeners();
-        },
-        onConnectionFailed: (error) {
-          debugPrint('❌ [Engine] 建立连接失败: $error');
-          setError('推流连接失败，请检查服务器状态');
-          _isStreaming = false;
-          setLoading(false);
-          notifyListeners();
-        },
-        onDisconnection: () {
-          debugPrint('⚠️ [Engine] 流已断开');
-          _isStreaming = false;
-          notifyListeners();
-        },
+        initialAudioConfig: AudioConfig(),
+        initialVideoConfig: VideoConfig.withDefaultBitrate(),
       );
 
       await _controller!.initialize();
       notifyListeners();
     } catch (e) {
-      setError('底层引擎初始化失败: $e');
+      setError("相机初始化失败，请检查手机麦克风和摄像头权限");
     }
   }
 
-  Future<void> switchCamera() async {
-    if (_controller == null) return;
-    await _controller!.switchCamera();
-    notifyListeners();
+  void switchCamera() {
+    if (_controller != null) {
+      _controller!.switchCamera();
+      notifyListeners();
+    }
   }
 
   void toggleMic() {
-    if (_controller == null) return;
-    _isMicOn = !_isMicOn;
-    _controller!.toggleMute();
-    notifyListeners();
+    if (_controller != null) {
+      _isMicOn = !_isMicOn;
+      notifyListeners();
+    }
   }
 
   void toggleMirror() {
@@ -70,47 +76,91 @@ class LivePrepareProvider extends BaseProvider {
     notifyListeners();
   }
 
-  // 核心推流控制逻辑
-  Future<void> startBroadcast(BuildContext context) async {
-    if (_controller == null) return;
+  // ================= 核心：开播与关播联动 =================
 
+  Future<void> startBroadcast(BuildContext context) async {
     if (_isStreaming) {
-      await _controller!.stopStreaming();
-      if (context.mounted) context.showAppToast(message: "已结束推流", type: AppToastType.info);
+      await _stopBroadcast(context);
       return;
     }
 
     setLoading(true);
+    clearError();
+    try {
+      // 🚀 直接去推流！如果是预告开播，这里会自动带上 _scheduledLiveId
+      final result = await _liveRepo.startLive(
+        title: title,
+        coverUrl: coverUrl,
+        scheduledLiveId: _scheduledLiveId, // 👈 关键点
+      );
 
-    // 1. 业务层：获取推流鉴权/房间信息
-    final repo = locator<LiveRepository>();
-    final result = await repo.createLiveRoom("我的静心直播");
+      if (result.status && result.data != null) {
+        String? rtmpUrl;
+        if (result.data is Map) {
+          _liveId = result.data['id']?.toString();
+          rtmpUrl = result.data['rtmpUrl']?.toString();
+        } else {
+          rtmpUrl = result.data.toString();
+        }
 
-    if (!context.mounted) return;
+        if (rtmpUrl == null || rtmpUrl.isEmpty) {
+          setError("未获取到推流地址");
+          return;
+        }
 
-    if (result.status) {
-      try {
-        debugPrint("🚀 [Engine] 启动推流器...");
+        if (context.mounted && _liveId != null) {
+          context.read<LiveStateProvider>().activateLiveState(liveId: _liveId!, isAnchor: true, rtmpUrl: rtmpUrl);
+        }
 
-        // 2. 引擎层：组装 RTMP 协议发起推流
-        // 🚨 请修改为你真实的云服务器公网 IP
-        await _controller!.startStreaming(streamKey: '123456', url: 'rtmp://47.92.105.53/live');
+        await _controller!.startStreaming(streamKey: "live", url: rtmpUrl);
 
-        context.showAppToast(message: "正在连接节点...", type: AppToastType.success);
-      } catch (e) {
-        setError("引擎装载失败: $e");
+        _isStreaming = true;
+        notifyListeners();
+      } else {
+        setError(result.message);
       }
-    } else {
-      setError(result.message);
+    } catch (e) {
+      setError("推流引擎异常: $e");
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   }
 
+  void updateTitle(String newTitle) {
+    title = newTitle;
+  }
+
+  /// 结束直播流程
+  Future<void> _stopBroadcast(BuildContext context) async {
+    setLoading(true);
+    try {
+      if (_controller != null) {
+        try {
+          await _controller!.stopStreaming();
+        } catch (_) {
+          await _controller!.stop();
+        }
+      }
+      _isStreaming = false;
+
+      if (context.mounted) {
+        await context.read<LiveStateProvider>().leaveOrEndLive();
+      }
+
+      notifyListeners();
+    } catch (e) {
+      setError("结束直播发生异常");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  // ================= 资源释放 =================
   @override
   void dispose() {
-    _controller?.stopStreaming();
-    _controller?.dispose();
+    try {
+      _controller?.stopStreaming();
+    } catch (_) {}
     super.dispose();
   }
 }

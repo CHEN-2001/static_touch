@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-// 🚀 1. 纯净的核心业务状态 (对接后端)
 enum LiveStatus {
   preparing(0), // 准备中
   live(1), // 直播中
@@ -14,7 +13,6 @@ enum LiveStatus {
   }
 }
 
-// 🚀 2. UI 渲染扩展 (将颜色和文字抽离到这里，UI 层直接调用 item.status.color)
 extension LiveStatusUIX on LiveStatus {
   String get tag {
     switch (this) {

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:static_touch/shared/models/stats/meditation_stats_model.dart'; // 🚀 引入正规模型
+import 'package:static_touch/shared/models/stats/meditation_stats_model.dart';
 
 // ================= 四宫格卡片组件 =================
 class StatCard extends StatelessWidget {
@@ -46,59 +46,106 @@ class StatCard extends StatelessWidget {
   }
 }
 
-// ================= 趋势图表组件 =================
-class TrendChart extends StatelessWidget {
+// ================= 趋势图表组件 (带气泡点击交互) =================
+class TrendChart extends StatefulWidget {
   final List<WeeklyTrendModel> trendData;
   const TrendChart({super.key, required this.trendData});
+
+  @override
+  State<TrendChart> createState() => _TrendChartState();
+}
+
+class _TrendChartState extends State<TrendChart> {
+  // 记录当前被点击悬浮的是哪一根柱子
+  int? _selectedIndex;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 10),
       height: 160,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: trendData.map((data) => _buildBar(context, data)).toList(),
+      // 点击图表空白区域，隐藏弹出的气泡
+      child: GestureDetector(
+        behavior: HitTestBehavior.translucent,
+        onTap: () => setState(() => _selectedIndex = null),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: widget.trendData.asMap().entries.map((entry) {
+            return _buildBar(context, entry.value, entry.key);
+          }).toList(),
+        ),
       ),
     );
   }
 
-  Widget _buildBar(BuildContext context, WeeklyTrendModel data) {
+  Widget _buildBar(BuildContext context, WeeklyTrendModel data, int index) {
     const Color activeColor = Color(0xFF8B2323);
     const Color goldColor = Color(0xFFD4AF37);
 
-    double heightRatio = (data.minutes / 100).clamp(0.2, 1.0);
+    // 计算柱体高度比例，最高 100%，最低 20% 打底
+    double heightRatio = (data.minutes / 100).clamp(0.01, 1.0);
 
+    // 获取当前时间并组装成 05-25 的后端横线格式
     final now = DateTime.now();
+    final String todayStr = '${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
 
-    final String todayStr = '${now.month.toString().padLeft(2, '0')}.${now.day.toString().padLeft(2, '0')}';
+    // 剔除两端隐形空格，防脏数据
+    final String cleanDate = data.date.trim();
 
-    bool isToday = (data.date == todayStr) || (data.date == '今日');
-    // ===================================================
+    // 判断是否是今天
+    bool isToday = (cleanDate == todayStr) || (cleanDate == '今日');
 
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        Container(
-          width: 16,
-          height: 100 * heightRatio,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(8),
-            color: isToday ? activeColor : goldColor.withValues(alpha: 0.4), // 👈 使用 isToday 决定颜色
+    // 判断这根柱子是否被用户点击选中了
+    bool isSelected = _selectedIndex == index;
+
+    return GestureDetector(
+      // 点击柱子切换气泡显示状态
+      onTap: () => setState(() => _selectedIndex = isSelected ? null : index),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          // 悬浮气泡 (带透明度动画，更丝滑)
+          AnimatedOpacity(
+            duration: const Duration(milliseconds: 200),
+            opacity: isSelected ? 1.0 : 0.0,
+            child: Container(
+              margin: const EdgeInsets.only(bottom: 6),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: activeColor.withValues(alpha: 0.9), // 半透明红色气泡底色
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: Text(
+                '${data.minutes}',
+                style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+              ),
+            ),
           ),
-        ),
-        const SizedBox(height: 10),
-        Text(
-          // 如果是今天，UI 上可以强制显示为 "今日"，否则显示后端传来的日期
-          isToday ? '今日' : data.date,
-          style: TextStyle(
-            fontSize: 11,
-            color: isToday ? activeColor : Colors.grey,
-            fontWeight: isToday ? FontWeight.bold : FontWeight.normal,
+
+          // 核心柱体
+          Container(
+            width: 16,
+            height: 100 * heightRatio,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+              color: isToday ? activeColor : goldColor.withValues(alpha: 0.4),
+            ),
           ),
-        ),
-      ],
+
+          const SizedBox(height: 10),
+
+          // 底部日期文字
+          Text(
+            isToday ? '今日' : cleanDate,
+            style: TextStyle(
+              fontSize: 11,
+              color: isToday ? activeColor : Colors.grey,
+              fontWeight: isToday ? FontWeight.bold : FontWeight.normal,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -123,7 +170,7 @@ class AchievementMedal extends StatelessWidget {
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             color: isUnlocked ? Colors.transparent : const Color(0xFFF5F5F5),
-            border: Border.all(color: medalColor.withOpacity(0.5), width: 2),
+            border: Border.all(color: medalColor.withValues(alpha: 0.5), width: 2),
           ),
           child: isUnlocked
               ? Icon(icon ?? Icons.workspace_premium, color: medalColor, size: 30)

@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
+import 'package:static_touch/shared/providers/live_state_provider.dart';
 import 'live_detail_provider.dart';
 import 'widgets/live_player.dart';
 import 'widgets/live_actions.dart';
 import 'widgets/live_chat_list.dart';
 
 class LiveDetailPage extends StatefulWidget {
-  const LiveDetailPage({super.key});
+  final String liveId;
+  const LiveDetailPage({super.key, required this.liveId});
 
   @override
   State<LiveDetailPage> createState() => _LiveDetailPageState();
@@ -15,13 +18,13 @@ class LiveDetailPage extends StatefulWidget {
 class _LiveDetailPageState extends State<LiveDetailPage> {
   final TextEditingController _inputController = TextEditingController();
   final FocusNode _focusNode = FocusNode();
+
   @override
   void initState() {
     super.initState();
-    // 🚀 核心修复：页面加载后，立即调用 enterRoom 方法
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      // 因为现在是测试阶段，我们先写死进入房间 '123456'
-      context.read<LiveDetailProvider>().enterRoom('123456');
+      context.read<LiveDetailProvider>().enterRoom(widget.liveId);
+      context.read<LiveStateProvider>().activateLiveState(liveId: widget.liveId, isAnchor: false);
     });
   }
 
@@ -41,6 +44,11 @@ class _LiveDetailPageState extends State<LiveDetailPage> {
     }
   }
 
+  Future<void> _handleExit() async {
+    await context.read<LiveStateProvider>().leaveOrEndLive();
+    if (mounted) context.pop();
+  }
+
   @override
   Widget build(BuildContext context) {
     final p = context.watch<LiveDetailProvider>();
@@ -56,7 +64,7 @@ class _LiveDetailPageState extends State<LiveDetailPage> {
               alignment: Alignment.topLeft,
               child: IconButton(
                 icon: const Icon(Icons.close, color: Colors.white, size: 28),
-                onPressed: () => Navigator.pop(context),
+                onPressed: _handleExit,
               ),
             ),
             p.isLoading
@@ -80,14 +88,17 @@ class _LiveDetailPageState extends State<LiveDetailPage> {
       padding: EdgeInsets.fromLTRB(16, 10, 16, bottomInset > 0 ? 10 : 20),
       decoration: BoxDecoration(
         color: Colors.black,
-        border: Border(top: BorderSide(color: Colors.white.withOpacity(0.1), width: 0.5)),
+        border: Border(top: BorderSide(color: Colors.white.withValues(alpha: 0.1), width: 0.5)),
       ),
       child: Row(
         children: [
           Expanded(
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16),
-              decoration: BoxDecoration(color: Colors.white.withOpacity(0.1), borderRadius: BorderRadius.circular(20)),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(20),
+              ),
               child: TextField(
                 controller: _inputController,
                 focusNode: _focusNode,

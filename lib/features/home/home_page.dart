@@ -4,7 +4,8 @@ import 'package:static_touch/features/home/widgets/home_header.dart';
 import 'package:static_touch/features/home/widgets/duration_card.dart';
 import 'package:static_touch/features/home/widgets/schedule_list.dart';
 import 'package:static_touch/shared/providers/user_state_provider.dart';
-import 'package:static_touch/shared/providers/live_state_provider.dart';
+import 'package:static_touch/shared/providers/system_state_provider.dart';
+import 'package:static_touch/features/home/home_provider.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -22,7 +23,8 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin 
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<UserStateProvider>().initData(isSilent: false);
-      context.read<LiveStateProvider>().initAndRefresh();
+      context.read<HomeProvider>().fetchTodaySchedule(isSilent: false);
+      context.read<SystemStateProvider>().fetchDailyQuote();
     });
   }
 

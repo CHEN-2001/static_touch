@@ -11,6 +11,13 @@ class ApiException {
           return '网络连接超时，请检查网络';
         case DioExceptionType.badResponse:
           if (error.response?.statusCode == 401) return '登录已过期';
+          final responseData = error.response?.data;
+          if (responseData != null && responseData is Map<String, dynamic>) {
+            if (responseData['msg'] != null &&
+                responseData['msg'].toString().isNotEmpty) {
+              return responseData['msg'];
+            }
+          }
           return '服务器异常 (${error.response?.statusCode})';
         default:
           return '网络连接断开';

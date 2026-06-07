@@ -1,7 +1,7 @@
 // api路径基础配置
 class ApiEndpoints {
   // 基础域名
-  static const String baseUrl = 'http://192.168.100.68:8080';
+  static const String baseUrl = 'http://192.168.1.10:8080';
 
   // --- 系统 模块 ---
   static const String dailyQuote = '/system//quote/random'; //每日语句

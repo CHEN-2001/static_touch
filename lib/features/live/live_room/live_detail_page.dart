@@ -10,7 +10,6 @@ import 'widgets/live_chat_list.dart';
 class LiveDetailPage extends StatefulWidget {
   final String liveId;
   const LiveDetailPage({super.key, required this.liveId});
-
   @override
   State<LiveDetailPage> createState() => _LiveDetailPageState();
 }

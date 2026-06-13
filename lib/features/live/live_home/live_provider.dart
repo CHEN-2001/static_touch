@@ -2,6 +2,7 @@ import 'package:static_touch/locator.dart';
 import 'package:static_touch/shared/providers/base_provider.dart';
 import 'package:static_touch/shared/models/live/live_item_model.dart';
 import 'package:static_touch/shared/repositories/live_repository.dart';
+import 'package:static_touch/shared/models/live/live_prepare_model.dart';
 
 class LiveProvider extends BaseProvider {
   final LiveRepository _liveRepo = locator<LiveRepository>();
@@ -41,6 +42,18 @@ class LiveProvider extends BaseProvider {
       if (!isSilent) setError("获取直播列表失败，请检查网络");
     } finally {
       if (!isSilent) setLoading(false);
+    }
+  }
+
+  Future<LivePrepareModel?> checkScheduledLive() async {
+    try {
+      final result = await _liveRepo.checkScheduledLive();
+      if (result.status && result.data != null) {
+        return LivePrepareModel.fromJson(result.data as Map<String, dynamic>);
+      }
+      return null;
+    } catch (e) {
+      rethrow;
     }
   }
 }

@@ -13,6 +13,7 @@ import 'package:static_touch/features/home/home_provider.dart';
 class ScheduleList extends StatelessWidget {
   const ScheduleList({super.key});
 
+  /// 核心注释：下拉刷新，并行更新用户信息与今日日程数据
   Future<void> _onRefresh(BuildContext context) async {
     await Future.wait([
       context.read<UserStateProvider>().initData(isSilent: true),
@@ -20,6 +21,7 @@ class ScheduleList extends StatelessWidget {
     ]);
   }
 
+  /// 核心注释：快捷进入逻辑，按状态优先级（直播中 > 准备中 > 第一条数据）自动分流进入
   void _handleQuickEnter(BuildContext context, List<LiveItemModel> items) {
     if (items.isEmpty) {
       context.showAppToast(message: "今日暂无直播安排", type: AppToastType.warning);
@@ -41,6 +43,7 @@ class ScheduleList extends StatelessWidget {
     _handleItemTap(context, items.first);
   }
 
+  /// 核心注释：点击单项，直播中同步激活直播全局状态并进房间，其它状态进入静心详情页
   void _handleItemTap(BuildContext context, LiveItemModel item) {
     switch (item.status) {
       case LiveStatus.ended:
@@ -81,7 +84,6 @@ class ScheduleList extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 16),
-
         Expanded(
           child: RefreshIndicator(
             color: const Color(0xFF8B2323),
@@ -94,6 +96,7 @@ class ScheduleList extends StatelessWidget {
     );
   }
 
+  /// 核心注释：根据加载状态与数组空实，分流渲染骨架屏、无数据兜底或真实列表视图
   Widget _buildListContent(bool isLoading, List<LiveItemModel> items) {
     if (isLoading && items.isEmpty) {
       return ListView.builder(
@@ -112,7 +115,6 @@ class ScheduleList extends StatelessWidget {
           Center(
             child: Column(
               children: [
-                Icon(Icons.event_busy, size: 60, color: Colors.grey.shade300),
                 const SizedBox(height: 16),
                 Text("今日暂无静心列表", style: TextStyle(color: Colors.grey.shade500, fontSize: 15)),
               ],
@@ -130,6 +132,7 @@ class ScheduleList extends StatelessWidget {
     );
   }
 
+  /// 核心注释：骨架屏组件，用于网络未就绪前的布局占位
   Widget _buildSkeletonItem() {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
@@ -151,6 +154,7 @@ class ScheduleList extends StatelessWidget {
     );
   }
 
+  /// 核心注释：基于直播模型状态渲染的具体单项卡片组件
   Widget _buildItem(BuildContext context, LiveItemModel item) {
     return GestureDetector(
       onTap: () => _handleItemTap(context, item),
@@ -197,6 +201,7 @@ class ScheduleList extends StatelessWidget {
     );
   }
 
+  /// 核心注释：根据状态返回对应动作文本（直播中为进入，其它为详情）
   String _getActionTextByStatus(LiveStatus status) {
     switch (status) {
       case LiveStatus.live:

@@ -33,7 +33,6 @@ class MeditationScheduleModel {
   }
 
   int get timeoutMinutes {
-    // 🚀 规范 2：判断是否为 preparing (准备中)
     if (status != LiveStatus.preparing) return 0;
     final now = DateTime.now();
     if (now.isAfter(expectedStartTime)) {

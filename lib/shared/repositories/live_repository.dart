@@ -6,28 +6,21 @@ class LiveRepository {
   final HttpClient _client;
   LiveRepository(this._client);
 
-  // 观众获取直播详情 / 进入房间
-  Future<ResultEntity> fetchLiveDetail(String liveId) async {
-    return await _client.get('${ApiEndpoints.liveDetail}/$liveId');
-  }
   // ================= 主播端接口 =================
 
   // 预发布直播间
-  Future<ResultEntity> scheduleLive({
-    required String title,
-    String coverUrl = '',
-    String? expectedStartTime, // 如果需要传时间，需符合后端 LocalDateTime 约定的格式 (如 ISO-8601)
-  }) async {
-    final data = {
-      'title': title,
-      'coverUrl': coverUrl,
-      if (expectedStartTime != null) 'expectedStartTime': expectedStartTime,
-    };
+  Future<ResultEntity> scheduleLive({required String title, String description = '', String? expectedStartTime}) async {
+    final data = {'title': title, 'description': description, 'expectedStartTime': expectedStartTime};
     return await _client.post(ApiEndpoints.liveSchedule, data: data);
   }
 
   // 正式开播 (支持直接开播，也支持带着 scheduledLiveId 启动预发布)
-  Future<ResultEntity> startLive({String? title, String? coverUrl, String? scheduledLiveId}) async {
+  Future<ResultEntity> startLive({
+    String? title,
+    String? description,
+    String? coverUrl,
+    String? scheduledLiveId,
+  }) async {
     final data = {
       if (title != null && title.isNotEmpty) 'title': title,
       if (coverUrl != null && coverUrl.isNotEmpty) 'coverUrl': coverUrl,
@@ -38,12 +31,27 @@ class LiveRepository {
 
   // 取消预发布的房间
   Future<ResultEntity> cancelSchedule(String liveId) async {
-    return await _client.post('${ApiEndpoints.liveBase}/$liveId/cancel');
+    return await _client.post(ApiEndpoints.liveCancel(liveId));
   }
 
   // 结束直播
   Future<ResultEntity> endLive(String liveId) async {
     return await _client.post('${ApiEndpoints.liveBase}/$liveId/end');
+  }
+
+  // 检查是否预直播是否发布
+  Future<ResultEntity> checkScheduledLive() async {
+    return await _client.get(ApiEndpoints.liveScheduleCheck);
+  }
+
+  /// 获取待开播列表
+  Future<ResultEntity> fetchUpcomingLives() async {
+    return await _client.get(ApiEndpoints.liveUpcoming);
+  }
+
+  /// 获取历史直播列表（分页查库）
+  Future<ResultEntity> fetchLiveHistory({int pageNum = 1, int pageSize = 10}) async {
+    return await _client.get(ApiEndpoints.liveHistory, queryParameters: {'pageNum': pageNum, 'pageSize': pageSize});
   }
 
   // 心跳保活 (App端定时器每隔几秒静默调用)
@@ -65,6 +73,6 @@ class LiveRepository {
 
   // 点击进入直播间 (实时获取拉流地址)
   Future<ResultEntity> enterLiveRoom(String liveId) async {
-    return await _client.get('${ApiEndpoints.liveBase}/$liveId/enter');
+    return await _client.get(ApiEndpoints.liveEnterRoom(liveId));
   }
 }

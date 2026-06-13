@@ -1,16 +1,17 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-// 🚀 确保引入你的 SDK
 import 'package:apivideo_live_stream/apivideo_live_stream.dart';
 import 'package:static_touch/locator.dart';
 import 'package:static_touch/shared/providers/base_provider.dart';
 import 'package:static_touch/shared/repositories/live_repository.dart';
 import 'package:static_touch/shared/providers/live_state_provider.dart';
+import 'package:static_touch/shared/models/live/live_prepare_model.dart';
+import 'package:static_touch/shared/widgets/app_dialogs.dart';
 
 class LivePrepareProvider extends BaseProvider {
   final LiveRepository _liveRepo = locator<LiveRepository>();
 
-  // ================= 摄像头与推流状态 =================
   ApiVideoLiveStreamController? _controller;
   ApiVideoLiveStreamController? get controller => _controller;
 
@@ -24,36 +25,69 @@ class LivePrepareProvider extends BaseProvider {
   bool get isStreaming => _isStreaming;
 
   // ================= 后端业务表单状态 =================
-  String title = '静心修行直播'; // 默认标题
+  String title = '静心修行直播';
+  String description = '';
   String coverUrl = '';
   String notice = '';
 
   String? _liveId;
   String? get liveId => _liveId;
 
-  // 🚀 接收从大厅传进来的预告ID
   String? _scheduledLiveId;
-
   String? get scheduledLiveId => _scheduledLiveId;
 
-  void setScheduledLiveId(String? id) {
-    _scheduledLiveId = id;
+  Timer? _heartbeatTimer;
+
+  // ================= 数据加载与更新 =================
+
+  void init(LivePrepareModel? model) {
+    if (model != null) {
+      _scheduledLiveId = model.liveId?.toString();
+      title = (model.title.isNotEmpty) ? model.title : '静心修行直播';
+      description = model.description;
+    }
     notifyListeners();
   }
 
-  // ================= 摄像头控制方法 =================
+  void updateLiveInfo(String newTitle, String newDesc) {
+    title = newTitle;
+    description = newDesc;
+    notifyListeners();
+  }
 
+  // ================= 摄像头控制方法 (完全还原测试成功版) =================
   Future<void> initCamera() async {
     try {
+      final videoConfig = VideoConfig.withDefaultBitrate(resolution: Resolution.RESOLUTION_720);
+      final audioConfig = AudioConfig(bitrate: 128 * 1000);
+
       _controller = ApiVideoLiveStreamController(
-        initialAudioConfig: AudioConfig(),
-        initialVideoConfig: VideoConfig.withDefaultBitrate(),
+        initialAudioConfig: audioConfig,
+        initialVideoConfig: videoConfig,
+        onConnectionSuccess: () {
+          debugPrint('✅ [Engine] RTMP 握手成功，推流中');
+          _isStreaming = true;
+          setLoading(false);
+          notifyListeners();
+        },
+        onConnectionFailed: (error) {
+          debugPrint('❌ [Engine] 建立连接失败: $error');
+          setError('推流连接失败，请检查服务器状态');
+          _isStreaming = false;
+          setLoading(false);
+          notifyListeners();
+        },
+        onDisconnection: () {
+          debugPrint('⚠️ [Engine] 流已断开');
+          _isStreaming = false;
+          notifyListeners();
+        },
       );
 
       await _controller!.initialize();
       notifyListeners();
     } catch (e) {
-      setError("相机初始化失败，请检查手机麦克风和摄像头权限");
+      setError('底层引擎初始化失败: $e');
     }
   }
 
@@ -67,6 +101,7 @@ class LivePrepareProvider extends BaseProvider {
   void toggleMic() {
     if (_controller != null) {
       _isMicOn = !_isMicOn;
+      _controller!.toggleMute();
       notifyListeners();
     }
   }
@@ -77,8 +112,9 @@ class LivePrepareProvider extends BaseProvider {
   }
 
   // ================= 核心：开播与关播联动 =================
-
   Future<void> startBroadcast(BuildContext context) async {
+    if (_controller == null) return;
+
     if (_isStreaming) {
       await _stopBroadcast(context);
       return;
@@ -87,53 +123,77 @@ class LivePrepareProvider extends BaseProvider {
     setLoading(true);
     clearError();
     try {
-      // 🚀 直接去推流！如果是预告开播，这里会自动带上 _scheduledLiveId
+      // 1. 调用后端接口开播
       final result = await _liveRepo.startLive(
         title: title,
+        description: description,
         coverUrl: coverUrl,
-        scheduledLiveId: _scheduledLiveId, // 👈 关键点
+        scheduledLiveId: _scheduledLiveId,
       );
 
       if (result.status && result.data != null) {
-        String? rtmpUrl;
+        String? fullRtmpUrl;
         if (result.data is Map) {
-          _liveId = result.data['id']?.toString();
-          rtmpUrl = result.data['rtmpUrl']?.toString();
+          _liveId = result.data['liveId']?.toString();
+          fullRtmpUrl = result.data['pushUrl']?.toString();
         } else {
-          rtmpUrl = result.data.toString();
+          fullRtmpUrl = result.data.toString();
         }
 
-        if (rtmpUrl == null || rtmpUrl.isEmpty) {
+        if (fullRtmpUrl == null || fullRtmpUrl.isEmpty) {
           setError("未获取到推流地址");
+          setLoading(false);
           return;
         }
 
-        if (context.mounted && _liveId != null) {
-          context.read<LiveStateProvider>().activateLiveState(liveId: _liveId!, isAnchor: true, rtmpUrl: rtmpUrl);
+        // 🚀 2. 完美的切割逻辑（将推流地址分离给 SDK）
+        String streamKey = "";
+        String baseUrl = "";
+
+        int lastSlashIndex = fullRtmpUrl.lastIndexOf('/');
+        if (lastSlashIndex != -1 && lastSlashIndex > 7) {
+          baseUrl = fullRtmpUrl.substring(0, lastSlashIndex);
+          streamKey = fullRtmpUrl.substring(lastSlashIndex + 1);
+        } else {
+          baseUrl = fullRtmpUrl;
+          streamKey = _liveId ?? "default";
         }
 
-        await _controller!.startStreaming(streamKey: "live", url: rtmpUrl);
+        if (context.mounted && _liveId != null) {
+          context.read<LiveStateProvider>().activateLiveState(liveId: _liveId!, isAnchor: true, rtmpUrl: fullRtmpUrl);
+        }
 
-        _isStreaming = true;
-        notifyListeners();
+        // 🚀 3. 推流
+        await _controller!.startStreaming(streamKey: streamKey, url: baseUrl);
+        _startHeartbeat();
       } else {
         setError(result.message);
+        setLoading(false);
       }
     } catch (e) {
       setError("推流引擎异常: $e");
-    } finally {
       setLoading(false);
     }
   }
 
-  void updateTitle(String newTitle) {
-    title = newTitle;
+  void _startHeartbeat() {
+    _heartbeatTimer?.cancel();
+    _heartbeatTimer = Timer.periodic(const Duration(seconds: 30), (timer) async {
+      if (_liveId != null && _isStreaming) {
+        try {
+          await _liveRepo.heartbeat(_liveId!);
+        } catch (e) {
+          debugPrint("心跳发送失败: $e");
+        }
+      }
+    });
   }
 
-  /// 结束直播流程
   Future<void> _stopBroadcast(BuildContext context) async {
     setLoading(true);
     try {
+      _heartbeatTimer?.cancel();
+
       if (_controller != null) {
         try {
           await _controller!.stopStreaming();
@@ -145,6 +205,7 @@ class LivePrepareProvider extends BaseProvider {
 
       if (context.mounted) {
         await context.read<LiveStateProvider>().leaveOrEndLive();
+        context.showAppToast(message: "已结束推流", type: AppToastType.info);
       }
 
       notifyListeners();
@@ -155,11 +216,12 @@ class LivePrepareProvider extends BaseProvider {
     }
   }
 
-  // ================= 资源释放 =================
   @override
   void dispose() {
+    _heartbeatTimer?.cancel();
     try {
       _controller?.stopStreaming();
+      _controller?.dispose();
     } catch (_) {}
     super.dispose();
   }

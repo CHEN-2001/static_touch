@@ -43,6 +43,7 @@ import 'package:static_touch/features/mine/profile_edit/profile_edit_provider.da
 import 'package:static_touch/features/mine/vip/vip_page.dart';
 import 'package:static_touch/features/mine/vip/vip_provider.dart';
 import 'package:static_touch/shared/providers/user_state_provider.dart';
+import 'package:static_touch/shared/models/live/live_prepare_model.dart';
 
 // 定义路由路径常量
 class AppRoutes {
@@ -163,29 +164,34 @@ class AppRouter {
         ),
       ),
       // 准备直播
+      // 准备直播
       GoRoute(
         path: AppRoutes.livePrepare,
         pageBuilder: (context, state) => fadePage(
           key: state.pageKey,
           child: ChangeNotifierProvider(
-            create: (_) => LivePrepareProvider(), // 注入新管家
+            create: (_) {
+              final provider = LivePrepareProvider();
+              final extra = state.extra as Map<String, dynamic>?;
+              final model = extra?['liveModel'] as LivePrepareModel?;
+              provider.init(model);
+
+              return provider;
+            },
             child: const LivePreparePage(),
           ),
         ),
       ),
       // 直播详细
-      // 直播详细
       GoRoute(
         path: AppRoutes.liveDetail,
         pageBuilder: (context, state) {
-          // 🚀 核心修复：将类型强转改为 String?，兜底值改为空字符串
           final liveId = state.extra as String? ?? '';
-
           return fadePage(
             key: state.pageKey,
             child: ChangeNotifierProvider(
               create: (_) => LiveDetailProvider(),
-              child: LiveDetailPage(liveId: liveId), // 把 String 类型的 ID 传给页面
+              child: LiveDetailPage(liveId: liveId),
             ),
           );
         },

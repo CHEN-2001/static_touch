@@ -13,8 +13,7 @@ class ApiException {
           if (error.response?.statusCode == 401) return '登录已过期';
           final responseData = error.response?.data;
           if (responseData != null && responseData is Map<String, dynamic>) {
-            if (responseData['msg'] != null &&
-                responseData['msg'].toString().isNotEmpty) {
+            if (responseData['msg'] != null && responseData['msg'].toString().isNotEmpty) {
               return responseData['msg'];
             }
           }

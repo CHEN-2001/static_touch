@@ -48,8 +48,12 @@ dependencies:
   media_kit: any
   media_kit_video: any
   media_kit_libs_video: ^1.0.7
-  #
+  #api.video 平台的直播推流库，用于 RTMP 推流功能
   apivideo_live_stream: ^1.2.0
+  #日期时间选择器
+  flutter_datetime_picker_plus: ^2.2.0
+  #websocket
+  web_socket_channel: ^2.4.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

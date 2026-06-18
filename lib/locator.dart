@@ -7,6 +7,8 @@ import 'package:static_touch/shared/repositories/collection_repository.dart';
 import 'package:static_touch/features/auth/auth_repository.dart';
 import 'package:static_touch/shared/repositories/nfc_repository.dart';
 import 'package:static_touch/shared/repositories/vip_repository.dart';
+import 'package:static_touch/shared/repositories/shop_repository.dart';
+import 'package:static_touch/shared/repositories/order_repository.dart';
 
 final locator = GetIt.instance;
 
@@ -26,4 +28,8 @@ void setupLocator() {
   locator.registerLazySingleton<NfcRepository>(() => NfcRepository(locator()));
   // 注册VIP仓库
   locator.registerLazySingleton<VipRepository>(() => VipRepository(locator()));
+  // 注册商城仓库
+  locator.registerLazySingleton<ShopRepository>(() => ShopRepository(locator()));
+  // 注册订单仓库
+  locator.registerLazySingleton<OrderRepository>(() => OrderRepository(locator()));
 }

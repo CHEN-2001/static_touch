@@ -45,7 +45,7 @@ class VipHeaderCard extends StatelessWidget {
                 Row(
                   children: [
                     Text(
-                      user.nickname.isEmpty ? '静触行者' : user.nickname,
+                      user.nickName.isEmpty ? '静触行者' : user.nickName,
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,

@@ -1,7 +1,7 @@
 class UserModel {
   final int id;
   final String email;
-  final String nickname;
+  final String nickName;
   final String avatarUrl;
   final String dailyQuote;
   final bool isVip;
@@ -11,7 +11,7 @@ class UserModel {
   UserModel({
     this.id = 0,
     this.email = '',
-    this.nickname = '',
+    this.nickName = '',
     this.avatarUrl = '',
     this.dailyQuote = '',
     this.isVip = false,
@@ -20,7 +20,7 @@ class UserModel {
   });
 
   factory UserModel.empty() =>
-      UserModel(id: -1, email: '', nickname: '加载中...', avatarUrl: '', dailyQuote: '修行中...', isVip: false, role: 0);
+      UserModel(id: -1, email: '', nickName: '加载中...', avatarUrl: '', dailyQuote: '修行中...', isVip: false, role: 0);
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
     bool parseIsVip(dynamic value) {
@@ -40,7 +40,7 @@ class UserModel {
     return UserModel(
       id: int.tryParse(json['id']?.toString() ?? '0') ?? 0,
       email: json['email']?.toString() ?? '',
-      nickname: json['nickname']?.toString() ?? 'user',
+      nickName: json['nickName']?.toString() ?? 'user',
       avatarUrl: json['avatarUrl']?.toString() ?? '',
       dailyQuote: json['dailyQuote']?.toString() ?? '',
       isVip: parseIsVip(json['isVip']),
@@ -56,7 +56,7 @@ class UserModel {
     return other is UserModel &&
         other.id == id &&
         other.email == email &&
-        other.nickname == nickname &&
+        other.nickName == nickName &&
         other.avatarUrl == avatarUrl &&
         other.dailyQuote == dailyQuote &&
         other.isVip == isVip &&
@@ -68,7 +68,7 @@ class UserModel {
   int get hashCode {
     return id.hashCode ^
         email.hashCode ^
-        nickname.hashCode ^
+        nickName.hashCode ^
         avatarUrl.hashCode ^
         dailyQuote.hashCode ^
         isVip.hashCode ^

@@ -50,7 +50,7 @@ class MineHeader extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    user.nickname.isEmpty ? '未登录' : user.nickname,
+                    user.nickName.isEmpty ? '未登录' : user.nickName,
                     style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Color(0xFF4A2B2B)),
                   ),
                   const SizedBox(height: 6),

@@ -4,6 +4,8 @@ import 'package:static_touch/routes/app_router.dart';
 import 'package:static_touch/shared/providers/user_state_provider.dart';
 import 'package:static_touch/shared/providers/live_state_provider.dart';
 import 'package:static_touch/shared/providers/system_state_provider.dart';
+import 'package:static_touch/features/shop/cart_provider.dart';
+import 'package:static_touch/features/shop/order_provider.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -15,6 +17,8 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => UserStateProvider()),
         ChangeNotifierProvider(create: (_) => LiveStateProvider()),
         ChangeNotifierProvider(create: (_) => SystemStateProvider()),
+        ChangeNotifierProvider(create: (_) => CartProvider()),
+        ChangeNotifierProvider(create: (_) => OrderProvider()),
       ],
       child: MaterialApp.router(
         title: '静触',

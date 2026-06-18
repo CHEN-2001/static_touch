@@ -1,7 +1,8 @@
 // api路径基础配置
 class ApiEndpoints {
   // 基础域名
-  static const String baseUrl = 'http://192.168.100.68:8080';
+  // static const String baseUrl = 'http://47.92.105.53:8081';
+  static const String baseUrl = 'http://192.168.100.68:8081';
 
   // --- 系统 模块 ---
   static const String dailyQuote = '/system//quote/random'; //每日语句
@@ -24,7 +25,7 @@ class ApiEndpoints {
   static const String liveUpcoming = '/live/upcoming'; // 获取待开播列表
   static const String liveHistory = '/live/history'; // 获取历史记录分页
   static String liveEnterRoom(String liveId) => '/live/$liveId/enter';
-
+  static const String reserveLive = '/live/reserve'; //直播预约相关
   static const String liveCreate = '/live/create'; //创建直播
   static const String liveEnd = '/live/end'; //结束直播
   static const String liveStart = '/live/start'; // 主播开播

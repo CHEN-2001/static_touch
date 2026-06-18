@@ -20,7 +20,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
   void initState() {
     super.initState();
     final user = context.read<UserStateProvider>().user;
-    _nameCtrl = TextEditingController(text: user.nickname);
+    _nameCtrl = TextEditingController(text: user.nickName);
     _quoteCtrl = TextEditingController(text: user.dailyQuote);
   }
 

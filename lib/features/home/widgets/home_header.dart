@@ -25,7 +25,7 @@ class HomeHeader extends StatelessWidget {
           );
         }
 
-        final displayName = provider.user.nickname.isEmpty ? '用户' : provider.user.nickname;
+        final displayName = provider.user.nickName.isEmpty ? '用户' : provider.user.nickName;
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
